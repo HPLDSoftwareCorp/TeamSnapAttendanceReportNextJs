@@ -4,6 +4,7 @@ import doLogin from "../lib/doLogin";
 import { useAsync } from "react-async";
 import loadMe from "../lib/loadMe";
 import { useState } from "react";
+import doLogout from "../lib/doLogout";
 
 export default function Home() {
   const { data: user, error, isPending, reload } = useAsync(loadMe);
@@ -23,9 +24,18 @@ export default function Home() {
         {isPending ? (
           <>Loading...</>
         ) : error ? (
-          <>Error: {String(error.stack || error.message || error)}</>
+          <>
+            <strong>Error</strong>
+            {String(error.message || error)}
+            <pre>{String(error.stack || "")}</pre>
+          </>
         ) : user ? (
-          <>You are logged in as {user.email}</>
+          <>
+            You are logged in as {user.email}{" "}
+            <button onClick={() => doLogout().then(() => reload())}>
+              Log Out
+            </button>
+          </>
         ) : (
           <button onClick={() => doLogin().then(() => reload())}>
             Login To TeamSnap

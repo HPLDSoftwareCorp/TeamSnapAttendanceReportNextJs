@@ -6,7 +6,7 @@ const doLogin = async () => {
   await teamsnap.startBrowserAuth(
     location.protocol === "http:"
       ? "urn:ietf:wg:oauth:2.0:oob"
-      : ["https://", location.hostname, "/oauth-callback"].join(""),
+      : [location.protocol, "//", location.host, "/oauth-callback"].join(""),
     ["read"]
   );
 };

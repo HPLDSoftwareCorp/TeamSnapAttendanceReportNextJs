@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "http-proxy-middleware": "^1.0.5",
     "next": "9.5.1",
     "react": "16.13.1",
     "react-async": "^10.0.1",
