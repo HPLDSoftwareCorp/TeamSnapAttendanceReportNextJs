@@ -11,8 +11,7 @@
     "next": "9.5.1",
     "react": "16.13.1",
     "react-async": "^10.0.1",
-    "react-dom": "16.13.1",
-    "xmlhttprequest": "^1.8.0"
+    "react-dom": "16.13.1"
   },
   "devDependencies": {
     "@types/node": "^14.11.1",
