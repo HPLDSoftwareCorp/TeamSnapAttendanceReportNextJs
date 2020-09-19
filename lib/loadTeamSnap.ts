@@ -36,6 +36,7 @@ export interface TeamSnap {
   collections?: unknown;
   hasSession(): boolean;
   init(clientId): void;
+  isAuthed(): boolean;
   loadCollections(): void;
   startBrowserAuth(redirect: string, scopes: string[]);
   request?: (
