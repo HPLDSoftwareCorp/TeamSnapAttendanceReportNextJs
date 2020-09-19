@@ -58,10 +58,10 @@ const loadTeamSnap = async (): Promise<TeamSnap> => {
     window.teamsnap.init(process.env.NEXT_PUBLIC_TEAMSNAP_CLIENT_ID);
   }
   const teamsnap = window.teamsnap;
-  if (teamsnap.hasSession() && !window.teamsnap.request) {
+  if (teamsnap.hasSession() && !teamsnap.request) {
     teamsnap.auth();
   }
-  if (!teamsnap.collections) {
+  if (teamsnap.request && !teamsnap.collections) {
     await teamsnap.loadCollections();
   }
   return teamsnap;
