@@ -8,6 +8,8 @@ import { useState } from "react";
 export default function Home() {
   const { data: user, error, isPending, reload } = useAsync(loadMe);
 
+  if (error) console.error(error);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -21,7 +23,7 @@ export default function Home() {
         {isPending ? (
           <>Loading...</>
         ) : error ? (
-          <>Error: {String(error)}</>
+          <>Error: {String(error.stack || error.message || error)}</>
         ) : user ? (
           <>You are logged in as {user.email}</>
         ) : (
@@ -29,7 +31,6 @@ export default function Home() {
             Login To TeamSnap
           </button>
         )}
-
       </main>
 
       <footer className={styles.footer}></footer>
