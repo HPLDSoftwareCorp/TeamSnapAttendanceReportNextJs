@@ -2,7 +2,7 @@ import loadTeamSnap from "./loadTeamSnap";
 
 const loadMe = async () => {
   const teamsnap = await loadTeamSnap();
-  if (!teamsnap.collections) return null;
+  if (!teamsnap.isAuthed()) return null;
   return teamsnap.loadMe();
 };
 

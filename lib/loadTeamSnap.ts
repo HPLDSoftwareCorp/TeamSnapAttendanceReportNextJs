@@ -31,6 +31,7 @@ export interface TeamSnapUser {
 }
 
 export interface TeamSnap {
+  apiUrl: string;
   auth(): TeamSnap;
   collections?: unknown;
   hasSession(): boolean;
@@ -55,10 +56,16 @@ declare global {
 const loadTeamSnap = async (): Promise<TeamSnap> => {
   if (!("teamsnap" in window)) {
     await import("teamsnap.js");
+    window.teamsnap.apiUrl = [
+      location.protocol,
+      "//",
+      location.host,
+      "/apiv3.teamsnap.com",
+    ].join("");
     window.teamsnap.init(process.env.NEXT_PUBLIC_TEAMSNAP_CLIENT_ID);
   }
   const teamsnap = window.teamsnap;
-  if (teamsnap.hasSession() && !teamsnap.request) {
+  if (teamsnap.hasSession() && !teamsnap.isAuthed()) {
     teamsnap.auth();
   }
   if (teamsnap.request && !teamsnap.collections) {

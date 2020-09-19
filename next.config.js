@@ -8,8 +8,8 @@ module.exports = {
         destination: '/:path*',
       },
       {
-        source: '/:path*',
-        destination: `https://custom-routes-proxying-endpoint.vercel.app/:path*`,
+        source: '/apiv3.teamsnap.com/:path*',
+        destination: `https://apiv3.teamsnap.com/:path*`,
       },
     ]
   },
