@@ -55,7 +55,6 @@ declare global {
 const loadTeamSnap = async (): Promise<TeamSnap> => {
   if (!("teamsnap" in window)) {
     await import("teamsnap.js");
-    console.log({ id: process.env.NEXT_PUBLIC_TEAMSNAP_CLIENT_ID });
     window.teamsnap.init(process.env.NEXT_PUBLIC_TEAMSNAP_CLIENT_ID);
   }
   const teamsnap = window.teamsnap;
