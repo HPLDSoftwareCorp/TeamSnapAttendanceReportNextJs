@@ -111,8 +111,10 @@ export default function EventData({
                     <td>{event.startDate.toLocaleDateString()}</td>
                     <th>Time</th>
                     <td>
-                      {formatDate(event.startDate, "h:mm b")} to{" "}
-                      {formatDate(event.endDate, "h:mm b")}
+                      {formatDate(event.startDate, "h:mm b")}
+                      {event.endDate && (
+                        <> to {formatDate(event.endDate, "h:mm b")}</>
+                      )}
                     </td>
                   </tr>
                 </tbody>
