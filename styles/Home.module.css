@@ -90,7 +90,8 @@ li.event table {
   width: 100%;
 }
 
-div.dateRange {
+div.dateRange input {
+  width: 10em;
 }
 
 @media print {
