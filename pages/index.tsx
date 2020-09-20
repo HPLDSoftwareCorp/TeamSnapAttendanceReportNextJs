@@ -275,6 +275,16 @@ export default function Home() {
           </>
         ) : (
           <div>
+            <p>
+              This reporting tool extracts attendance information from TeamSnap.
+              It is built to help with mandatory attendance reporting for
+              contact tracing purposes. Because it makes use of your existing
+              TeamSnap "availability" feature, it can save a LOT of manual
+              paperwork over having team members manually fill out digital or
+              paper forms. All you have to do is make sure that the availability
+              is correctly set to reflect who attended each event, and then you
+              can run this report.
+            </p>
             <p>To get started, click the "Log In" button below.</p>
             <p>
               <strong>Terms of Service</strong> This service is provided by HPLD
@@ -285,6 +295,11 @@ export default function Home() {
               <strong>Privacy</strong> Your data is kept private and handled
               entirely on your own device / computer, and is not shared with us
               or any third party.
+            </p>
+            <p>
+              <strong>Pricing</strong> The product is currently in a free "early
+              access" period as it's development is finalized. Pricing to cover
+              the cost of development, maintenance, and hosting TBD.
             </p>
             <p>
               <label>

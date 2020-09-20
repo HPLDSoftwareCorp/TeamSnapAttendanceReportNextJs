@@ -92,15 +92,6 @@ export default function EventData({
     ? contacts.filter((c) => availabilityMap.get(c.memberId)?.statusCode === 1)
     : contacts;
 
-  console.log({
-    event,
-    team,
-    availabilities,
-    contacts,
-    phoneNumbers: phoneNumbersState.data,
-    emails: emailAddressesState.data,
-  });
-
   return (
     <div className={styles.container}>
       <table className={styles.attendees} cellPadding={0} cellSpacing={0}>

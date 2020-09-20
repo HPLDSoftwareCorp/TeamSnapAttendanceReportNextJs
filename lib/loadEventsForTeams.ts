@@ -11,7 +11,6 @@ export default memoize(
     const allEvents = await Promise.all(
       teamIds.map((teamId) => loadEvents(teamId))
     );
-    console.log("loadEventsForTeams", teamIds, allEvents);
     return sortBy(
       allEvents.reduce((a, b) => unionBy(a, b, "id"), []),
       "startDate"
