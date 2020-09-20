@@ -47,7 +47,7 @@ function AllOrNone<T>({
 export default function Home() {
   const [selectedTeams, setSelectedTeams] = useState<number[]>([]);
   const [agreed, setAgreed] = useState<boolean>(
-    !!sessionStorage?.agreedToTerms
+    !!(process.browser && sessionStorage.agreedToTerms)
   );
   const onClickAgree = () => {
     sessionStorage["agreedToTerms"] = true;
@@ -90,9 +90,6 @@ export default function Home() {
     activeTeams.map((t) => [t.id, t])
   );
 
-  console.log({ events, locations });
-  console.log({ activeTeams });
-  console.log("range", startDate, endDate);
   return (
     <div className={styles.container}>
       <Head>
