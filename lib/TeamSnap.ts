@@ -92,12 +92,12 @@ type LoadEventsParams = { teamId: number };
 
 export interface TeamSnapEvent {
   additionalLocationDetails: unknown;
-  arrivalDate: Date;
+  arrivalDate?: Date | null;
   createdAt: Date;
   divisionLocationId: number;
   doesntCountTowardsRecord: boolean;
   durationInMinutes: number;
-  endDate: Date;
+  endDate?: Date | null;
   formattedResults: unknown;
   formattedTitle: string;
   formattedTitleForMultiTeam: string;
@@ -131,7 +131,7 @@ export interface TeamSnapEvent {
   shootoutPointsForOpponent: number | null;
   shootoutPointsForTeam: number | null;
   sourceTimeZoneIanaName: string;
-  startDate: Date;
+  startDate?: Date | null;
   teamId: number;
   timeZone: string;
   timeZoneDescription: string;
