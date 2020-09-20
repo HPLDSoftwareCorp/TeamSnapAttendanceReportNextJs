@@ -99,21 +99,23 @@ export default function EventData({
           <tr>
             <td colSpan={4 + +!onlyAttendees}>
               <table className={styles.eventSummary}>
-                <tr>
-                  <th>Location</th>
-                  <td>{event.locationName}</td>
-                  <th>Team</th>
-                  <td colSpan={3}>{formatTeamLabel(team)}</td>
-                </tr>
-                <tr>
-                  <th>Date</th>
-                  <td>{event.startDate.toLocaleDateString()}</td>
-                  <th>Time</th>
-                  <td>
-                    {formatDate(event.startDate, "h:mm b")} to{" "}
-                    {formatDate(event.endDate, "h:mm b")}
-                  </td>
-                </tr>
+                <tbody>
+                  <tr>
+                    <th>Location</th>
+                    <td>{event.locationName}</td>
+                    <th>Team</th>
+                    <td colSpan={3}>{formatTeamLabel(team)}</td>
+                  </tr>
+                  <tr>
+                    <th>Date</th>
+                    <td>{event.startDate.toLocaleDateString()}</td>
+                    <th>Time</th>
+                    <td>
+                      {formatDate(event.startDate, "h:mm b")} to{" "}
+                      {formatDate(event.endDate, "h:mm b")}
+                    </td>
+                  </tr>
+                </tbody>
               </table>
             </td>
           </tr>

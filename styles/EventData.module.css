@@ -19,26 +19,22 @@ table.attendees {
   width: 100%;
 }
 
-table.attendees td,
-table.attendees tr {
+table.attendees > thead > tr > th,
+table.attendees > thead > tr > td {
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
   padding: 0.5em 1em;
 }
 
-table.attendees thead > tr > th,
-table.attendees thead > tr > td {
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
-}
-
-table.attendees tbody > tr > td:not(:first-child),
-table.attendees tbody > tr > th:not(:first-child),
-table.attendees thead > tr > td:not(:first-child),
-table.attendees thead > tr > th:not(:first-child) {
+table.attendees > tbody > tr > td:not(:first-child),
+table.attendees > tbody > tr > th:not(:first-child),
+table.attendees > thead > tr > td:not(:first-child),
+table.attendees > thead > tr > th:not(:first-child) {
   border-left: 1px solid #ccc;
 }
-table.attendees tbody > tr > td {
+table.attendees > tbody > tr > td {
   border-bottom: 1px solid #ccc;
 }
-table.attendees tbody > tr:nth-child(odd) > td {
+table.attendees > tbody > tr:nth-child(odd) > td {
   background-color: #efefef;
 }

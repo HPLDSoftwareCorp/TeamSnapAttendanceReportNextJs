@@ -128,51 +128,55 @@ export default function Home() {
             <div className={styles.dateRange}>
               <h3>Options</h3>
               <table>
-                <tr>
-                  <th>Start Date</th>
-                  <td>
-                    <input
-                      type="date"
-                      required
-                      max={format(endDate, "yyyy-MM-dd")}
-                      value={format(startDate, "yyyy-MM-dd")}
-                      onChange={(e) =>
-                        setStartDate(
-                          parse(e.target.value, "yyyy-MM-dd", startDate)
-                        )
-                      }
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <th>End Date</th>
-                  <td>
-                    <input
-                      type="date"
-                      required
-                      min={format(startDate, "yyyy-MM-dd")}
-                      value={format(endDate, "yyyy-MM-dd")}
-                      onChange={(e) =>
-                        setEndDate(
-                          endOfDay(parse(e.target.value, "yyyy-MM-dd", endDate))
-                        )
-                      }
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <th>Availability</th>
-                  <td>
-                    <label>
+                <tbody>
+                  <tr>
+                    <th>Start Date</th>
+                    <td>
                       <input
-                        type="checkbox"
-                        checked={onlyAttendees}
-                        onChange={() => setOnlyAttendees(!onlyAttendees)}
-                      />{" "}
-                      Only show contacts with availability YES
-                    </label>
-                  </td>
-                </tr>
+                        type="date"
+                        required
+                        max={format(endDate, "yyyy-MM-dd")}
+                        value={format(startDate, "yyyy-MM-dd")}
+                        onChange={(e) =>
+                          setStartDate(
+                            parse(e.target.value, "yyyy-MM-dd", startDate)
+                          )
+                        }
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>End Date</th>
+                    <td>
+                      <input
+                        type="date"
+                        required
+                        min={format(startDate, "yyyy-MM-dd")}
+                        value={format(endDate, "yyyy-MM-dd")}
+                        onChange={(e) =>
+                          setEndDate(
+                            endOfDay(
+                              parse(e.target.value, "yyyy-MM-dd", endDate)
+                            )
+                          )
+                        }
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Availability</th>
+                    <td>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={onlyAttendees}
+                          onChange={() => setOnlyAttendees(!onlyAttendees)}
+                        />{" "}
+                        Only show contacts with availability YES
+                      </label>
+                    </td>
+                  </tr>
+                </tbody>
               </table>
             </div>
             {isBefore(endDate, startDate) ? (
