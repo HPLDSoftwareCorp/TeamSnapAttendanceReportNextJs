@@ -90,11 +90,17 @@ export default function Home() {
   const teamMap = new Map<number, TeamSnapTeam>(
     activeTeams.map((t) => [t.id, t])
   );
+  const leagues = Array.from(
+    new Set(activeTeams.map((t) => t.leagueName))
+  ).filter(Boolean);
 
   return (
     <div className={styles.container}>
       <Head>
-        <title>TeamSnap Attendance Report</title>
+        <title>
+          Attendance Report - {leagues.length === 1 ? leagues[0] + " - " : ""}
+          {format(startDate, "yyyy-MM-dd")} thru {format(endDate, "yyyy-MM-dd")}{" "}
+        </title>
       </Head>
 
       <main className={styles.main}>
