@@ -12,5 +12,5 @@ export default memoize(
     }
     return event.loadItems("healthCheckQuestionnaires", { eventId: event.id });
   },
-  (teamId) => String(teamId)
+  ({ teamId }) => String(teamId)
 );

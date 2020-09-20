@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEventHandler, useState } from "react";
 import {
   TeamSnapAvailability,
   TeamSnapContact,
@@ -23,13 +23,19 @@ export interface EventDataProps {
   onlyAttendees: boolean;
 }
 
+let rsvpYesCheckmark = "\u2713";
+let healthCheckVerifiedSymbol = "\u271A";
 const formatAvailability = (
   a: TeamSnapAvailability,
   q: TeamSnapHealthCheckQuestionnaire
 ) =>
   [
-    a?.statusCode === 1 ? "\u2713" : a?.statusCode === 0 ? "\u2718" : "?",
-    q?.status === "verified" && "\u271A",
+    a?.statusCode === 1
+      ? rsvpYesCheckmark
+      : a?.statusCode === 0
+      ? "\u2718"
+      : "?",
+    q?.status === "verified" && healthCheckVerifiedSymbol,
   ]
     .filter(Boolean)
     .join(" ") || "?";
@@ -40,6 +46,12 @@ export default function EventData({
   onlyAttendees,
 }: EventDataProps) {
   let teamId = team.id;
+  const notesKey = ["event", event.id, "notes"].join("-");
+  const [notes, setNotes] = useState(sessionStorage[notesKey]);
+  const onChangeNotes: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
+    setNotes(e.target.value);
+    sessionStorage[notesKey] = e.target.value;
+  };
   const membersState = useAsync({ promise: loadMembers(teamId) });
   const members = membersState.data || [];
   const contactsState = useAsync({ promise: loadContacts(teamId) });
@@ -55,7 +67,7 @@ export default function EventData({
     promise: loadContactEmailAddresses(teamId),
   });
   const hcqState = useAsync({
-    promise: !onlyAttendees && loadHealthCheckQuestionnaires(event),
+    promise: loadHealthCheckQuestionnaires(event),
   });
   const hcqs = hcqState.data || [];
   const pending: string[] = [];
@@ -102,18 +114,22 @@ export default function EventData({
   );
   const availabilityMap = new Map(availabilities.map((a) => [a.memberId, a]));
   const filteredMembers = onlyAttendees
-    ? members.filter(
-        (member) => availabilityMap.get(member.id)?.statusCode === 1
-      )
+    ? members.filter((member) => {
+        let availability = availabilityMap.get(member.id);
+        let hcq = hcqMap.get(member.id);
+        let statusCode = availability?.statusCode;
+        return (
+          statusCode === 1 || (statusCode !== 0 && hcq?.status === "verified")
+        );
+      })
     : members;
   const contactMap = groupByMemberId(contacts);
-  let showRSVP = onlyAttendees && filteredMembers.length;
   return (
     <div className={styles.container}>
       <table className={styles.attendees} cellPadding={0} cellSpacing={0}>
         <thead>
           <tr>
-            <td colSpan={4 + +showRSVP}>
+            <td colSpan={5}>
               <table className={styles.eventSummary}>
                 <tbody>
                   <tr>
@@ -142,7 +158,7 @@ export default function EventData({
             <th>Parent/Contact</th>
             <th>Phone</th>
             <th>Email</th>
-            {!showRSVP && <th>RSVP</th>}
+            <th>RSVP</th>
           </tr>
         </thead>
         <tbody>
@@ -197,13 +213,25 @@ export default function EventData({
                   </td>
                   <td>{phoneNumbers.join(", ")}</td>
                   <td>{emails.join(", ")}</td>
-                  {!showRSVP && (
-                    <td>{formatAvailability(availability, hcq)}</td>
-                  )}
+                  <td>{formatAvailability(availability, hcq)}</td>
                 </tr>
               );
             }
           )}
+          <tr>
+            <td colSpan={6} className={styles.notes}>
+              <label>
+                <div>Notes & Additional Contacts</div>
+                <textarea onChange={onChangeNotes} value={notes} />
+              </label>
+              {!!notes.trim() && (
+                <pre>
+                  Notes & Additional Contacts:{"\n"}
+                  {notes}
+                </pre>
+              )}
+            </td>
+          </tr>
         </tbody>
       </table>
       {onlyAttendees && filteredMembers.length < members.length && (

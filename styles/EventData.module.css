@@ -38,3 +38,24 @@ table.attendees > tbody > tr > td {
 table.attendees > tbody > tr:nth-child(odd) > td {
   background-color: #efefef;
 }
+
+table.attendees td.notes textarea {
+  height: 5em;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+table.attendees td.notes pre {
+  display: none;
+}
+
+@media print {
+  table.attendees td.notes label {
+    display: none;
+  }
+  table.attendees td.notes pre {
+    display: block;
+    font-family: inherit;
+    padding: 1em;
+  }
+}
