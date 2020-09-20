@@ -47,7 +47,7 @@ export default function EventData({
 }: EventDataProps) {
   let teamId = team.id;
   const notesKey = ["event", event.id, "notes"].join("-");
-  const [notes, setNotes] = useState(sessionStorage[notesKey]);
+  const [notes, setNotes] = useState(sessionStorage[notesKey] || '');
   const onChangeNotes: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
     setNotes(e.target.value);
     sessionStorage[notesKey] = e.target.value;
