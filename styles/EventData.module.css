@@ -1,0 +1,40 @@
+.container {
+  padding-top: 2em;
+}
+
+table.eventSummary {
+}
+
+@media print {
+  table.eventSummary,
+  table.attendees {
+    page-break-inside: avoid;
+  }
+}
+
+table.attendees {
+  border: 2px solid #ccc;
+  width: 100%;
+}
+
+table.attendees td,
+table.attendees tr {
+  padding: 0.5em 1em;
+}
+
+table.attendees thead > tr > th,
+table.attendees thead > tr > td {
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+
+table.attendees tbody > tr > td:not(:first-child),
+table.attendees tbody > tr > th:not(:first-child),
+table.attendees thead > tr > td:not(:first-child),
+table.attendees thead > tr > th:not(:first-child) {
+  border-left: 1px solid #ccc;
+}
+
+table.attendees tbody > tr:nth-child(odd) > td {
+  background-color: #efefef;
+}

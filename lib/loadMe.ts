@@ -1,9 +1,11 @@
 import loadTeamSnap from "./loadTeamSnap";
+import memoize from "lodash/memoize";
 
-const loadMe = async () => {
-  const teamsnap = await loadTeamSnap();
-  if (!teamsnap.isAuthed()) return null;
-  return teamsnap.loadMe();
-};
-
-export default loadMe;
+export default memoize(
+  async function loadMe() {
+    const teamsnap = await loadTeamSnap();
+    if (!teamsnap.isAuthed()) return null;
+    return teamsnap.loadMe();
+  },
+  () => sessionStorage["teamsnap.authToken"]
+);

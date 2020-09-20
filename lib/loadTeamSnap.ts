@@ -1,50 +1,4 @@
-export interface TeamSnapUser {
-  activeTeamsCount: number;
-  addressCountry: string | null;
-  addressState: string | null;
-  birthday: string | null;
-  canSendMessages: true;
-  commissionedTeamIds: number[];
-  createdAt: Date;
-  email: string;
-  facebookAccessToken: string | null;
-  facebookId: string | null;
-  firstName: string;
-  highestRole: string;
-  href: string;
-  id: number;
-  isAdmin: boolean;
-  isEligibleForFreeTrial: boolean;
-  isLabRat: boolean;
-  lastName: string;
-  links: unknown;
-  managedDivisionIds: number[];
-  managedDivisionsCount: 0;
-  managedTeamIds: number[];
-  ownedDivisionIds: number[];
-  ownedTeamIds: number[];
-  personUuid: string;
-  receivesNewsletter: boolean;
-  teamsCount: number;
-  type: string;
-  updatedAt: Date;
-}
-
-export interface TeamSnap {
-  browserLogout();
-  apiUrl: string;
-  auth(): TeamSnap;
-  collections?: unknown;
-  hasSession(): boolean;
-  init(clientId): void;
-  isAuthed(): boolean;
-  loadCollections(): void;
-  startBrowserAuth(redirect: string, scopes: string[]);
-  request?: {
-    hook(f: (xhr: XMLHttpRequest, data: unknown) => void): void;
-  };
-  loadMe(): Promise<TeamSnapUser>;
-}
+import { TeamSnap } from "./TeamSnap";
 
 declare global {
   interface Window {
@@ -54,6 +8,7 @@ declare global {
     data?: object;
   }
 }
+
 const patchUrl = (url: string) => {
   const parsed = new URL(url);
   if (parsed.protocol !== location.protocol || parsed.host !== location.host) {
