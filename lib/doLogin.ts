@@ -9,6 +9,8 @@ const doLogin = async () => {
       : [location.protocol, "//", location.host, "/oauth-callback"].join(""),
     ["read"]
   );
+  // Patch the request and load collections
+  await loadTeamSnap();
 };
 
 export default doLogin;

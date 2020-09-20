@@ -24,6 +24,10 @@ const patchUrl = (url: string) => {
   return url;
 };
 const patchRequest = (baseRequest: any) => {
+  if ("baseRequest" in baseRequest) {
+    // Already patched this one
+    return baseRequest;
+  }
   const request: any = (
     method: string,
     url: string,
@@ -54,8 +58,8 @@ const loadTeamSnap = async (): Promise<TeamSnap> => {
   if (teamsnap.hasSession() && !teamsnap.isAuthed()) {
     teamsnap.apiUrl = patchUrl(teamsnap.apiUrl);
     teamsnap.auth();
-    teamsnap.request = patchRequest(teamsnap.request);
   }
+  teamsnap.request = patchRequest(teamsnap.request);
   if (teamsnap.request && !teamsnap.collections) {
     await teamsnap.loadCollections();
   }
