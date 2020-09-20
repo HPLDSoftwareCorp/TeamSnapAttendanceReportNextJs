@@ -5,16 +5,19 @@ import loadEvents from "./loadEvents";
 import sortBy from "lodash/sortBy";
 
 export default memoize(
-  async function loadEventsForAllTeams(
-    teamIds: number[]
+  async function loadEventsForTeams(
+    teamIds: number[],
+    startedAfter: Date,
+    startedBefore: Date
   ): Promise<TeamSnapEvent[]> {
     const allEvents = await Promise.all(
-      teamIds.map((teamId) => loadEvents(teamId))
+      teamIds.map((teamId) => loadEvents(teamId, startedAfter, startedBefore))
     );
     return sortBy(
       allEvents.reduce((a, b) => unionBy(a, b, "id"), []),
       "startDate"
     );
   },
-  (teamIds) => sortBy(teamIds).join(",")
+  (teamIds, startedAfter, startedBefore) =>
+    [sortBy(teamIds).join(","), startedAfter, startedBefore].join(" ")
 );

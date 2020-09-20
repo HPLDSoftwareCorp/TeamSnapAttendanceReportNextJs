@@ -88,7 +88,12 @@ export interface TeamSnapUser {
   ): Promise<TeamSnapTeam[]>;
 }
 
-type LoadEventsParams = { teamId: number };
+type LoadEventsParams = {
+  sortStartDate?: boolean;
+  startedAfter?: string;
+  startedBefore?: string;
+  teamId: number;
+};
 
 export interface TeamSnapEvent {
   additionalLocationDetails: unknown;

@@ -69,7 +69,7 @@ export default function Home() {
   });
   const activeTeams = teamsState.data || [];
   const eventsState = useAsync<TeamSnapEvent[]>({
-    promise: loadEventsForTeams(selectedTeams),
+    promise: loadEventsForTeams(selectedTeams, startDate, endDate),
   });
   const events = (eventsState.data || []).filter(
     (e) =>
