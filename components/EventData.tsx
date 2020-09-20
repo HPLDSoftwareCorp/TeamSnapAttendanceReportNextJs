@@ -40,7 +40,7 @@ export default function EventData({ event, team }: EventDataProps) {
   if (phoneNumbersState.isPending) pending.push("phone numbers");
   if (emailAddressesState.isPending) pending.push("email addresses");
   if (pending.length) {
-    return <>Loading {pending.join(", ")} ...</>;
+    return <div>Loading {pending.join(", ")} ...</div>;
   }
   const error =
     contactsState.error ||

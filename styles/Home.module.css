@@ -30,18 +30,6 @@
   align-items: center;
 }
 
-@media print {
-  .footer,
-  .title,
-  .noPrint,
-  .checkboxes,
-  .topBar,
-  .dateRange,
-  .loginState {
-    display: none;
-  }
-}
-
 .topBar {
   width: auto;
   display: flex;
@@ -103,9 +91,14 @@ li.event table {
 div.dateRange {
 }
 
-@media (max-width: 600px) {
-  .grid {
-    width: 100%;
-    flex-direction: column;
+@media print {
+  .footer,
+  .title,
+  .noPrint,
+  .checkboxes,
+  .topBar,
+  .dateRange,
+  .loginState {
+    display: none !important;
   }
 }
