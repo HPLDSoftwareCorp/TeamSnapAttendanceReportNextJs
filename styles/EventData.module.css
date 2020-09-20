@@ -34,7 +34,9 @@ table.attendees thead > tr > td:not(:first-child),
 table.attendees thead > tr > th:not(:first-child) {
   border-left: 1px solid #ccc;
 }
-
+table.attendees tbody > tr > td {
+  border-bottom: 1px solid #ccc;
+}
 table.attendees tbody > tr:nth-child(odd) > td {
   background-color: #efefef;
 }
