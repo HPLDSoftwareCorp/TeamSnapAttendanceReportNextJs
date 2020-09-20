@@ -98,14 +98,15 @@ export default function Home() {
     <div className={styles.container}>
       <Head>
         <title>
-          Attendance Report - {leagues.length === 1 ? leagues[0] + " - " : ""}
+          Contact Tracing Report -{" "}
+          {leagues.length === 1 ? leagues[0] + " - " : ""}
           {format(startDate, "yyyy-MM-dd")} thru {format(endDate, "yyyy-MM-dd")}{" "}
         </title>
       </Head>
 
       <main className={styles.main}>
         <div className={styles.topBar}>
-          <h1>TeamSnap Attendance Report</h1>
+          <h1>Contact Tracing Report for TeamSnap Users</h1>
           {user && (
             <div className={styles.loginState}>
               {user.email}{" "}
