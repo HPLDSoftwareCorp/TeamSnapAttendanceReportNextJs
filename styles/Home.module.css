@@ -36,7 +36,8 @@
   .noPrint,
   .checkboxes,
   .topBar,
-  .dateRange {
+  .dateRange,
+  .loginState {
     display: none;
   }
 }
@@ -45,12 +46,13 @@
   width: auto;
   display: flex;
   flex-direction: row;
-  height: 2em;
   align-content: space-between;
   color: white;
   background-color: #3e3e93;
   align-items: center;
   justify-content: space-between;
+  padding: 0.5em 1em;
+  margin-bottom: 3em;
 }
 
 .loginState {
@@ -99,10 +101,6 @@ li.event table {
 }
 
 div.dateRange {
-  display: flex;
-  flex-direction: row;
-  height: 2em;
-  align-items: center;
 }
 
 @media (max-width: 600px) {

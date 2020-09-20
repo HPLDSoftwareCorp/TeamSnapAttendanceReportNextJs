@@ -115,28 +115,47 @@ export default function Home() {
             <h3>Error</h3>
             {String(userState.error.message || userState.error)}
             <pre>{String(userState.error.stack || "")}</pre>
+            <p>
+              Try reloading the page. If that doesn't fix it,{" "}
+              <a href="mailto:Dobes Vandermeer <dobesv+teamsnapattendance@gmail.com>">
+                Email Us
+              </a>
+            </p>
           </>
         ) : user ? (
           <>
             <div className={styles.dateRange}>
-              Start date:
-              <input
-                type="date"
-                value={format(startDate, "yyyy-MM-dd")}
-                onChange={(e) =>
-                  setStartDate(parse(e.target.value, "yyyy-MM-dd", startDate))
-                }
-              />
-              End date:
-              <input
-                type="date"
-                value={format(endDate, "yyyy-MM-dd")}
-                onChange={(e) =>
-                  setEndDate(
-                    endOfDay(parse(e.target.value, "yyyy-MM-dd", endDate))
-                  )
-                }
-              />
+              <h3>Date Range</h3>
+              <table>
+                <tr>
+                  <th>Start Date</th>
+                  <td>
+                    <input
+                      type="date"
+                      value={format(startDate, "yyyy-MM-dd")}
+                      onChange={(e) =>
+                        setStartDate(
+                          parse(e.target.value, "yyyy-MM-dd", startDate)
+                        )
+                      }
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <th>End Date</th>
+                  <td>
+                    <input
+                      type="date"
+                      value={format(endDate, "yyyy-MM-dd")}
+                      onChange={(e) =>
+                        setEndDate(
+                          endOfDay(parse(e.target.value, "yyyy-MM-dd", endDate))
+                        )
+                      }
+                    />
+                  </td>
+                </tr>
+              </table>
             </div>
             {isBefore(endDate, startDate) ? (
               <strong>Please choose an end date after the start date</strong>
@@ -179,7 +198,7 @@ export default function Home() {
                 ) : eventsState.isPending ? (
                   <h3>Loading events and locations...</h3>
                 ) : locations?.length === 0 ? (
-                  <h3>No Events Found</h3>
+                  <h3>No Events Found, try adjusting the date range.</h3>
                 ) : (
                   <>
                     <h3>Locations ({locations.length})</h3>
