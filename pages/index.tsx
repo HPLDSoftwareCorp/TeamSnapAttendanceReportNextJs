@@ -236,6 +236,17 @@ export default function Home() {
                             team={teamMap.get(event.teamId)}
                           />
                         ))}
+                        <div className={styles.noPrint}>
+                          <h3>Distribution</h3>
+                          <p>
+                            To send this, print the page to a PDF file using
+                            your browser's print feature, and send that PDF to
+                            the appropriate person.
+                          </p>
+                          <p>
+                            <button onClick={() => print()}>Print</button>
+                          </p>
+                        </div>
                       </>
                     )}
                   </>
