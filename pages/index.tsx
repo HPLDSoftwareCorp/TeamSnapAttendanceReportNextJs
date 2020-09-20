@@ -49,6 +49,7 @@ export default function Home() {
   const [agreed, setAgreed] = useState<boolean>(
     !!(process.browser && sessionStorage.agreedToTerms)
   );
+  const [onlyAttendees, setOnlyAttendees] = useState<boolean>(true);
   const onClickAgree = () => {
     sessionStorage["agreedToTerms"] = true;
     setAgreed(true);
@@ -125,13 +126,15 @@ export default function Home() {
         ) : user ? (
           <>
             <div className={styles.dateRange}>
-              <h3>Date Range</h3>
+              <h3>Options</h3>
               <table>
                 <tr>
                   <th>Start Date</th>
                   <td>
                     <input
                       type="date"
+                      required
+                      max={format(endDate, "yyyy-MM-dd")}
                       value={format(startDate, "yyyy-MM-dd")}
                       onChange={(e) =>
                         setStartDate(
@@ -146,6 +149,8 @@ export default function Home() {
                   <td>
                     <input
                       type="date"
+                      required
+                      min={format(startDate, "yyyy-MM-dd")}
                       value={format(endDate, "yyyy-MM-dd")}
                       onChange={(e) =>
                         setEndDate(
@@ -153,6 +158,19 @@ export default function Home() {
                         )
                       }
                     />
+                  </td>
+                </tr>
+                <tr>
+                  <th>Availability</th>
+                  <td>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={onlyAttendees}
+                        onChange={() => setOnlyAttendees(!onlyAttendees)}
+                      />{" "}
+                      Only show contacts with availability YES
+                    </label>
                   </td>
                 </tr>
               </table>
@@ -234,6 +252,7 @@ export default function Home() {
                             key={event.id}
                             event={event}
                             team={teamMap.get(event.teamId)}
+                            onlyAttendees={onlyAttendees}
                           />
                         ))}
                         <div className={styles.noPrint}>

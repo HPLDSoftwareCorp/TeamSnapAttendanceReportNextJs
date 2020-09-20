@@ -1,5 +1,10 @@
 import React from "react";
-import { TeamSnapEvent, TeamSnapTeam } from "../lib/TeamSnap";
+import {
+  TeamSnapAvailability,
+  TeamSnapEvent,
+  TeamSnapHealthCheckQuestionnaire,
+  TeamSnapTeam,
+} from "../lib/TeamSnap";
 import loadAvailabilities from "../lib/loadAvailabilities";
 import { useAsync } from "react-async";
 import loadHealthCheckQuestionnaires from "../lib/loadHealthCheckQuestionnaires";
@@ -13,9 +18,25 @@ import formatDate from "date-fns/format";
 export interface EventDataProps {
   event: TeamSnapEvent;
   team: TeamSnapTeam;
+  onlyAttendees: boolean;
 }
 
-export default function EventData({ event, team }: EventDataProps) {
+const formatAvailability = (
+  a: TeamSnapAvailability,
+  q: TeamSnapHealthCheckQuestionnaire
+) =>
+  [
+    a?.statusCode === 1 ? "\u2713" : a?.statusCode === 0 ? "\u2718" : "?",
+    q?.status === "verified" && "\u271A",
+  ]
+    .filter(Boolean)
+    .join(" ") || "?";
+
+export default function EventData({
+  event,
+  team,
+  onlyAttendees,
+}: EventDataProps) {
   let teamId = team.id;
   const contactsState = useAsync({ promise: loadContacts(teamId) });
   const contacts = contactsState.data || [];
@@ -30,7 +51,7 @@ export default function EventData({ event, team }: EventDataProps) {
     promise: loadContactEmailAddresses(teamId),
   });
   const hcqState = useAsync({
-    promise: loadHealthCheckQuestionnaires(event),
+    promise: !onlyAttendees && loadHealthCheckQuestionnaires(event),
   });
   const hcqs = hcqState.data || [];
   const pending: string[] = [];
@@ -57,18 +78,19 @@ export default function EventData({ event, team }: EventDataProps) {
       </div>
     );
   }
-  const contactsMap = new Map(contacts.map((c) => [c.memberId, c]));
   const emailsMap = new Map<number, string>(
     (emailAddressesState.data || []).map((ea) => [ea.memberId, ea.email])
   );
   const phoneNumbersMap = new Map<number, string>(
     (phoneNumbersState.data || []).map((pn) => [pn.memberId, pn.phoneNumber])
   );
-  const availabilityMap = new Map(availabilities.map((a) => [a.memberId, a]));
-  const hcqMap = new Map(hcqs.map((q) => [q.memberId, q]));
-  const attendees = contacts.filter(
-    (c) => availabilityMap.get(c.memberId)?.statusCode === 1
+  const hcqMap = new Map(
+    hcqs.filter((q) => q.eventId === event.id).map((q) => [q.memberId, q])
   );
+  const availabilityMap = new Map(availabilities.map((a) => [a.memberId, a]));
+  const filteredContacts = onlyAttendees
+    ? contacts.filter((c) => availabilityMap.get(c.memberId)?.statusCode === 1)
+    : contacts;
 
   console.log({
     event,
@@ -84,7 +106,7 @@ export default function EventData({ event, team }: EventDataProps) {
       <table className={styles.attendees} cellPadding={0} cellSpacing={0}>
         <thead>
           <tr>
-            <td colSpan={4}>
+            <td colSpan={4 + +!onlyAttendees}>
               <table className={styles.eventSummary}>
                 <tr>
                   <th>Location</th>
@@ -109,15 +131,24 @@ export default function EventData({ event, team }: EventDataProps) {
             <th>Last Name</th>
             <th>Phone</th>
             <th>Email</th>
+            {!onlyAttendees && <th>RSVP</th>}
           </tr>
         </thead>
         <tbody>
-          {attendees.map((contact) => (
+          {filteredContacts.map((contact) => (
             <tr key={contact.id}>
               <td>{contact.firstName || contact.userFirstName || ""}</td>
               <td>{contact.lastName || contact.userLastName || ""}</td>
               <td>{phoneNumbersMap.get(contact.memberId)}</td>
               <td>{emailsMap.get(contact.memberId)}</td>
+              {!onlyAttendees && (
+                <td>
+                  {formatAvailability(
+                    availabilityMap.get(contact.memberId),
+                    hcqMap.get(contact.memberId)
+                  )}
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
