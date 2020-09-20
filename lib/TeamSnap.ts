@@ -218,6 +218,64 @@ export interface TeamSnapContact {
   userLastName: string | null;
 }
 
+export interface TeamSnapMember {
+  addressCity: string;
+  addressCountry: string;
+  addressState: string;
+  addressStreet1: string;
+  addressStreet2: string;
+  addressZip: string;
+  birthday?: string | null;
+  createdAt: Date;
+  divisionId: number;
+  emailAddresses?: string[] | null;
+  firstName: string;
+  gender: "Male" | "Female" | string;
+  hasFacebookPostScoresEnabled: boolean;
+  hideAddress: boolean;
+  hideAge: boolean;
+  href: string;
+  id: number;
+  invitationCode: null;
+  invitationDeclined: null;
+  isActivated: boolean;
+  isAddressHidden: boolean;
+  isAgeHidden: boolean;
+  isAlertable: boolean;
+  isCoach: boolean;
+  isCommissioner: boolean;
+  isDeletable: boolean;
+  isEditable: boolean;
+  isEmailable: boolean;
+  isInvitable: boolean;
+  isInvited: boolean;
+  isLeagueOwner: boolean;
+  isManager: boolean;
+  isNonPlayer: boolean;
+  isOwner: boolean;
+  isOwnershipPending: unknown | null;
+  isPending: boolean;
+  isPushable: boolean;
+  isSelectableForChat: boolean;
+  isShownUnreachableForChatBanner: boolean;
+  jerseyNumber: unknown | null;
+  lastLoggedInAt: unknown | null;
+  lastName: string;
+  links: any;
+  pendingDivisionId: unknown | null;
+  pendingTeamId: unknown | null;
+  personUuid: unknown | null;
+  phoneNumbers?: string[] | null;
+  position: "Defence";
+  registrationFormId: number;
+  roleUuid: unknown | null;
+  sourceMemberId: number | null;
+  teamId: number;
+  type: "member";
+  updatedAt: Date;
+  userId: number;
+}
+
 export interface TeamSnapContactEmailAddress {
   contactId: number;
   createdAt: Date;
@@ -262,6 +320,7 @@ type LoadAvailabilitiesParams = { eventId: number };
 type LoadHealthCheckQuestionnairesParams = { eventId: number };
 type LoadContactEmailAddressesParams = { teamId: number };
 type LoadContactPhoneNumbersParams = { teamId: number };
+type LoadMembersParams = { teamId: number };
 
 export interface TeamSnap {
   browserLogout();
@@ -298,7 +357,7 @@ export interface TeamSnap {
     params: LoadHealthCheckQuestionnairesParams
   ): Promise<TeamSnapHealthCheckQuestionnaire[]>;
   loadTeams(params: LoadTeamsParams): Promise<TeamSnapTeam[]>;
-
+  loadMembers(params: LoadMembersParams): Promise<TeamSnapMember[]>;
   loadContactEmailAddresses(
     params: LoadContactEmailAddressesParams
   ): TeamSnapContactEmailAddress[];

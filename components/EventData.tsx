@@ -1,6 +1,7 @@
 import React from "react";
 import {
   TeamSnapAvailability,
+  TeamSnapContact,
   TeamSnapEvent,
   TeamSnapHealthCheckQuestionnaire,
   TeamSnapTeam,
@@ -14,6 +15,7 @@ import styles from "styles/EventData.module.css";
 import loadContactEmailAddresses from "../lib/loadContactEmailAddresses";
 import loadContactPhoneNumbers from "../lib/loadContactPhoneNumbers";
 import formatDate from "date-fns/format";
+import loadMembers from "../lib/loadMembers";
 
 export interface EventDataProps {
   event: TeamSnapEvent;
@@ -38,6 +40,8 @@ export default function EventData({
   onlyAttendees,
 }: EventDataProps) {
   let teamId = team.id;
+  const membersState = useAsync({ promise: loadMembers(teamId) });
+  const members = membersState.data || [];
   const contactsState = useAsync({ promise: loadContacts(teamId) });
   const contacts = contactsState.data || [];
   const availabilitiesState = useAsync({
@@ -55,6 +59,7 @@ export default function EventData({
   });
   const hcqs = hcqState.data || [];
   const pending: string[] = [];
+  if (membersState.isPending) pending.push("members");
   if (contactsState.isPending) pending.push("contacts");
   if (availabilitiesState.isPending) pending.push("availabilities");
   if (hcqState.isPending) pending.push("health check questionnaires");
@@ -64,6 +69,7 @@ export default function EventData({
     return <div>Loading {pending.join(", ")} ...</div>;
   }
   const error =
+    membersState.error ||
     contactsState.error ||
     availabilitiesState.error ||
     hcqState.error ||
@@ -78,20 +84,29 @@ export default function EventData({
       </div>
     );
   }
-  const emailsMap = new Map<number, string>(
-    (emailAddressesState.data || []).map((ea) => [ea.memberId, ea.email])
-  );
-  const phoneNumbersMap = new Map<number, string>(
-    (phoneNumbersState.data || []).map((pn) => [pn.memberId, pn.phoneNumber])
-  );
+  const groupByMemberId = <T extends { memberId: number }>(
+    elts: T[]
+  ): Map<number, T[]> => {
+    const result = new Map<number, T[]>();
+    for (const elt of elts) {
+      const group = result.get(elt.memberId);
+      if (group) group.push(elt);
+      else result.set(elt.memberId, [elt]);
+    }
+    return result;
+  };
+  const emailsMap = groupByMemberId(emailAddressesState.data || []);
+  const phoneNumbersMap = groupByMemberId(phoneNumbersState.data || []);
   const hcqMap = new Map(
     hcqs.filter((q) => q.eventId === event.id).map((q) => [q.memberId, q])
   );
   const availabilityMap = new Map(availabilities.map((a) => [a.memberId, a]));
-  const filteredContacts = onlyAttendees
-    ? contacts.filter((c) => availabilityMap.get(c.memberId)?.statusCode === 1)
-    : contacts;
-
+  const filteredMembers = onlyAttendees
+    ? members.filter(
+        (member) => availabilityMap.get(member.id)?.statusCode === 1
+      )
+    : members;
+  const contactMap = groupByMemberId(contacts);
   return (
     <div className={styles.container}>
       <table className={styles.attendees} cellPadding={0} cellSpacing={0}>
@@ -122,30 +137,70 @@ export default function EventData({
             </td>
           </tr>
           <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
+            <th>Team Member</th>
+            <th>Parent/Contact</th>
             <th>Phone</th>
             <th>Email</th>
             {!onlyAttendees && <th>RSVP</th>}
           </tr>
         </thead>
         <tbody>
-          {filteredContacts.map((contact) => (
-            <tr key={contact.id}>
-              <td>{contact.firstName || contact.userFirstName || ""}</td>
-              <td>{contact.lastName || contact.userLastName || ""}</td>
-              <td>{phoneNumbersMap.get(contact.memberId)}</td>
-              <td>{emailsMap.get(contact.memberId)}</td>
-              {!onlyAttendees && (
+          {filteredMembers.map((member) => {
+            const availability = availabilityMap.get(member.id);
+            const hcq = hcqMap.get(member.id);
+            const contacts = contactMap.get(member.id) || [];
+            const phoneNumbers = Array.from(
+              new Set(
+                [
+                  ...(member.phoneNumbers || []),
+                  ...(phoneNumbersMap
+                    .get(member.id)
+                    ?.map((ph) => ph.phoneNumber) || []),
+                ].filter(Boolean)
+              )
+            ).sort();
+            const emails = Array.from(
+              new Set(
+                [
+                  ...(member.emailAddresses || []),
+                  ...(emailsMap.get(member.id)?.map((em) => em.email) || []),
+                ].filter(Boolean)
+              )
+            ).sort();
+            return (
+              <tr key={member.id}>
                 <td>
-                  {formatAvailability(
-                    availabilityMap.get(contact.memberId),
-                    hcqMap.get(contact.memberId)
-                  )}
+                  {member.firstName || ""} {member.lastName || ""}
                 </td>
-              )}
-            </tr>
-          ))}
+                <td>
+                  {Array.from(
+                    new Set(
+                      contacts
+                        .filter(
+                          (contact) =>
+                            contact.firstName !== member.firstName ||
+                            contact.lastName !== member.lastName
+                        )
+                        .map((contact) =>
+                          [
+                            contact?.firstName || contact?.userFirstName,
+                            contact?.lastName || contact?.userLastName,
+                          ]
+                            .filter(Boolean)
+                            .join(" ")
+                        )
+                        .filter(Boolean)
+                    )
+                  ).join(", ")}
+                </td>
+                <td>{phoneNumbers.join(", ")}</td>
+                <td>{emails.join(", ")}</td>
+                {!onlyAttendees && (
+                  <td>{formatAvailability(availability, hcq)}</td>
+                )}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
