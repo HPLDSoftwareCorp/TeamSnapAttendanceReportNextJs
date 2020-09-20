@@ -59,7 +59,9 @@ const loadTeamSnap = async (): Promise<TeamSnap> => {
     teamsnap.apiUrl = patchUrl(teamsnap.apiUrl);
     teamsnap.auth();
   }
-  teamsnap.request = patchRequest(teamsnap.request);
+  if (teamsnap.isAuthed()) {
+    teamsnap.request = patchRequest(teamsnap.request);
+  }
   if (teamsnap.request && !teamsnap.collections) {
     await teamsnap.loadCollections();
   }
