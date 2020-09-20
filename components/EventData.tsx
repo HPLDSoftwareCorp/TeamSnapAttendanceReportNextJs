@@ -107,12 +107,13 @@ export default function EventData({
       )
     : members;
   const contactMap = groupByMemberId(contacts);
+  let showRSVP = onlyAttendees && filteredMembers.length;
   return (
     <div className={styles.container}>
       <table className={styles.attendees} cellPadding={0} cellSpacing={0}>
         <thead>
           <tr>
-            <td colSpan={4 + +!onlyAttendees}>
+            <td colSpan={4 + +showRSVP}>
               <table className={styles.eventSummary}>
                 <tbody>
                   <tr>
@@ -141,68 +142,75 @@ export default function EventData({
             <th>Parent/Contact</th>
             <th>Phone</th>
             <th>Email</th>
-            {!onlyAttendees && <th>RSVP</th>}
+            {!showRSVP && <th>RSVP</th>}
           </tr>
         </thead>
         <tbody>
-          {filteredMembers.map((member) => {
-            const availability = availabilityMap.get(member.id);
-            const hcq = hcqMap.get(member.id);
-            const contacts = contactMap.get(member.id) || [];
-            const phoneNumbers = Array.from(
-              new Set(
-                [
-                  ...(member.phoneNumbers || []),
-                  ...(phoneNumbersMap
-                    .get(member.id)
-                    ?.map((ph) => ph.phoneNumber) || []),
-                ].filter(Boolean)
-              )
-            ).sort();
-            const emails = Array.from(
-              new Set(
-                [
-                  ...(member.emailAddresses || []),
-                  ...(emailsMap.get(member.id)?.map((em) => em.email) || []),
-                ].filter(Boolean)
-              )
-            ).sort();
-            return (
-              <tr key={member.id}>
-                <td>
-                  {member.firstName || ""} {member.lastName || ""}
-                </td>
-                <td>
-                  {Array.from(
-                    new Set(
-                      contacts
-                        .filter(
-                          (contact) =>
-                            contact.firstName !== member.firstName ||
-                            contact.lastName !== member.lastName
-                        )
-                        .map((contact) =>
-                          [
-                            contact?.firstName || contact?.userFirstName,
-                            contact?.lastName || contact?.userLastName,
-                          ]
-                            .filter(Boolean)
-                            .join(" ")
-                        )
-                        .filter(Boolean)
-                    )
-                  ).join(", ")}
-                </td>
-                <td>{phoneNumbers.join(", ")}</td>
-                <td>{emails.join(", ")}</td>
-                {!onlyAttendees && (
-                  <td>{formatAvailability(availability, hcq)}</td>
-                )}
-              </tr>
-            );
-          })}
+          {(filteredMembers.length ? filteredMembers : members).map(
+            (member) => {
+              const availability = availabilityMap.get(member.id);
+              const hcq = hcqMap.get(member.id);
+              const contacts = contactMap.get(member.id) || [];
+              const phoneNumbers = Array.from(
+                new Set(
+                  [
+                    ...(member.phoneNumbers || []),
+                    ...(phoneNumbersMap
+                      .get(member.id)
+                      ?.map((ph) => ph.phoneNumber) || []),
+                  ].filter(Boolean)
+                )
+              ).sort();
+              const emails = Array.from(
+                new Set(
+                  [
+                    ...(member.emailAddresses || []),
+                    ...(emailsMap.get(member.id)?.map((em) => em.email) || []),
+                  ].filter(Boolean)
+                )
+              ).sort();
+              return (
+                <tr key={member.id}>
+                  <td>
+                    {member.firstName || ""} {member.lastName || ""}
+                  </td>
+                  <td>
+                    {Array.from(
+                      new Set(
+                        contacts
+                          .filter(
+                            (contact) =>
+                              contact.firstName !== member.firstName ||
+                              contact.lastName !== member.lastName
+                          )
+                          .map((contact) =>
+                            [
+                              contact?.firstName || contact?.userFirstName,
+                              contact?.lastName || contact?.userLastName,
+                            ]
+                              .filter(Boolean)
+                              .join(" ")
+                          )
+                          .filter(Boolean)
+                      )
+                    ).join(", ")}
+                  </td>
+                  <td>{phoneNumbers.join(", ")}</td>
+                  <td>{emails.join(", ")}</td>
+                  {!showRSVP && (
+                    <td>{formatAvailability(availability, hcq)}</td>
+                  )}
+                </tr>
+              );
+            }
+          )}
         </tbody>
       </table>
+      {onlyAttendees && filteredMembers.length < members.length && (
+        <div style={{ textAlign: "center" }}>
+          {filteredMembers.length} of {members.length} members
+        </div>
+      )}
     </div>
   );
 }
