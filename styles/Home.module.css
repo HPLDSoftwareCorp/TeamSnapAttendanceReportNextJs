@@ -19,7 +19,8 @@
 
 @media print {
   .main {
-    width: auto;
+    width: 100%;
+    max-width: 100%;
   }
 }
 
