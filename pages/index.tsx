@@ -308,7 +308,7 @@ export default function Home() {
       </main>
 
       <footer className={styles.footer}>
-        Copyright &copy; 2020 HPLD Software Corp., All Rights Reserved.{" "}
+        Copyright &copy; 2020 HPLD Software Corp., All Rights Reserved.{" - "}
         <a href="mailto:Dobes Vandermeer <dobesv+teamsnapattendance@gmail.com>">
           Email Us
         </a>
