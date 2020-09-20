@@ -90,7 +90,7 @@ li.event table {
   width: 100%;
 }
 
-div.dateRange input {
+div.dateRange input[type="date"] {
   width: 12em;
 }
 
