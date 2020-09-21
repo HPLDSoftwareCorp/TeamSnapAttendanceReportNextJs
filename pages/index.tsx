@@ -303,14 +303,16 @@ export default function Home() {
               service is not guaranteed - use at your own risk.
             </p>
             <p>
-              <strong>Privacy</strong> Your data is kept private and handled
-              entirely on your own device / computer, and is not shared with us
-              or any third party.
+              <strong>Privacy</strong> Team attendance and contact data is kept
+              private and handled entirely on your own device / computer, and is
+              not shared with us or any third party. We may keep records of the
+              name, email address, league name, TeamSnap user/league ID, and IP
+              address of users who log in.
             </p>
             <p>
-              <strong>Pricing</strong> The product is currently in a free "early
-              access" period as it's development is finalized. Pricing to cover
-              the cost of development, maintenance, and hosting TBD.
+              <strong>Pricing</strong> Free for now. Buy us a drink if this tool
+              saves you time. If we introduce up-front pricing later, existing
+              active users be grandfathered in.
             </p>
             <p>
               <label>
