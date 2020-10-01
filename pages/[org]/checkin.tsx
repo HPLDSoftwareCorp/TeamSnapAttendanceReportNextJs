@@ -14,7 +14,7 @@ import {
   roundToNearestMinutes,
   subHours,
 } from "date-fns";
-import styles from "styles/IntakeForm.module.css";
+import styles from "styles/checkin.module.css";
 import Head from "next/head";
 import doLogout from "lib/teamsnap/doLogout";
 import doLogin from "lib/teamsnap/doLogin";
@@ -63,7 +63,7 @@ const healthQuestionList = [
     <h3>Have you been asked by public health to self-isolate?</h3>
   </>,
 ];
-export default function IntakeForm() {
+export default function Checkin() {
   const router = useRouter();
   const lookAheadHours = Number(router.query.hours || 8);
   const startDate = roundToNearestMinutes(subHours(Date.now(), 1), {
