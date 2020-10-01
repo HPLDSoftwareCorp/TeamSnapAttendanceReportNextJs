@@ -1,0 +1,13 @@
+.yesNoContainer,
+.yesNoContainer label {
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+}
+
+.yesNoContainer label {
+}
+
+.yesNoContainer input {
+  margin: 0 1em;
+}

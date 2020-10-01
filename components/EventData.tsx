@@ -5,17 +5,17 @@ import {
   TeamSnapEvent,
   TeamSnapHealthCheckQuestionnaire,
   TeamSnapTeam,
-} from "../lib/TeamSnap";
-import loadAvailabilities from "../lib/loadAvailabilities";
+} from "lib/teamsnap/TeamSnap";
+import loadAvailabilities from "lib/teamsnap/loadAvailabilities";
 import { useAsync } from "react-async";
-import loadHealthCheckQuestionnaires from "../lib/loadHealthCheckQuestionnaires";
-import loadContacts from "../lib/loadContacts";
-import formatTeamLabel from "../lib/formatTeamLabel";
+import loadHealthCheckQuestionnaires from "lib/teamsnap/loadHealthCheckQuestionnaires";
+import loadContacts from "lib/teamsnap/loadTeamContacts";
+import formatTeamLabel from "lib/teamsnap/formatTeamLabel";
 import styles from "styles/EventData.module.css";
-import loadContactEmailAddresses from "../lib/loadContactEmailAddresses";
-import loadContactPhoneNumbers from "../lib/loadContactPhoneNumbers";
+import loadContactEmailAddressesForTeam from "lib/teamsnap/loadContactEmailAddressesForTeam";
+import loadContactPhoneNumbersForTeam from "lib/teamsnap/loadContactPhoneNumbersForTeam";
 import formatDate from "date-fns/format";
-import loadMembers from "../lib/loadMembers";
+import loadMembers from "lib/teamsnap/loadMembers";
 
 export interface EventDataProps {
   event: TeamSnapEvent;
@@ -47,7 +47,7 @@ export default function EventData({
 }: EventDataProps) {
   let teamId = team.id;
   const notesKey = ["event", event.id, "notes"].join("-");
-  const [notes, setNotes] = useState(sessionStorage[notesKey] || '');
+  const [notes, setNotes] = useState(sessionStorage[notesKey] || "");
   const onChangeNotes: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
     setNotes(e.target.value);
     sessionStorage[notesKey] = e.target.value;
@@ -61,10 +61,10 @@ export default function EventData({
   });
   const availabilities = availabilitiesState.data || [];
   const phoneNumbersState = useAsync({
-    promise: loadContactPhoneNumbers(teamId),
+    promise: loadContactPhoneNumbersForTeam(teamId),
   });
   const emailAddressesState = useAsync({
-    promise: loadContactEmailAddresses(teamId),
+    promise: loadContactEmailAddressesForTeam(teamId),
   });
   const hcqState = useAsync({
     promise: loadHealthCheckQuestionnaires(event),

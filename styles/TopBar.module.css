@@ -1,0 +1,41 @@
+.topBar {
+  width: auto;
+  display: flex;
+  flex-direction: row;
+  align-content: space-between;
+  color: white;
+  background-color: #3e3e93;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5em 1em;
+  margin-bottom: 3em;
+}
+
+.topBar .loginState {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.topBar .loginState button {
+  border: none;
+  color: white;
+  background: none;
+  margin: 0 1em;
+}
+
+.topBar .loginState button:hover {
+  color: #eef;
+  cursor: pointer;
+}
+
+.topBar h1 {
+  font-size: 12px;
+  text-align: left;
+}
+
+@media print {
+  .topBar {
+    display: none !important;
+  }
+}

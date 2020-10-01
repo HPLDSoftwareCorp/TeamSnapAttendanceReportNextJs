@@ -221,6 +221,8 @@ export interface TeamSnapContact {
   userFirstName: string | null;
   userId: number | null;
   userLastName: string | null;
+
+  loadItem(key: "member"): Promise<TeamSnapMember>;
 }
 
 export interface TeamSnapMember {
@@ -301,6 +303,25 @@ export interface TeamSnapContactEmailAddress {
   updatedAt: Date;
 }
 
+export interface TeamSnapMemberPhoneNumber {
+  createdAt: Date;
+  href: string;
+  id: number;
+  isHidden: boolean;
+  isPreferred: boolean;
+  label: string | null;
+  links: any;
+  memberId: number;
+  phoneNumber: string | null;
+  preferred: boolean;
+  smsEmailAddress: unknown | null;
+  smsEnabled: boolean;
+  smsGatewayId: unknown | null;
+  teamId: string;
+  type: "contactPhoneNumber";
+  updatedAt: Date;
+}
+
 export interface TeamSnapContactPhoneNumber {
   contactId: number;
   createdAt: Date;
@@ -321,11 +342,40 @@ export interface TeamSnapContactPhoneNumber {
   updatedAt: Date;
 }
 
-type LoadAvailabilitiesParams = { eventId: number };
-type LoadHealthCheckQuestionnairesParams = { eventId: number };
-type LoadContactEmailAddressesParams = { teamId: number };
-type LoadContactPhoneNumbersParams = { teamId: number };
-type LoadMembersParams = { teamId: number };
+interface LoadAvailabilitiesParams {
+  eventId: number;
+}
+
+interface LoadHealthCheckQuestionnairesParams {
+  eventId: number;
+}
+
+interface LoadContactEmailAddressesParams {
+  contactId?: number;
+  teamId?: number;
+}
+
+interface LoadMemberEmailAddressesParams {
+  teamId?: number;
+  memberId?: number;
+}
+
+interface LoadContactPhoneNumbersParams {
+  contactId?: number;
+  teamId?: number;
+}
+
+interface LoadMembersParams {
+  contactId?: number;
+  teamId?: number;
+  userId?: number;
+}
+
+interface LoadContactsParams {
+  memberId?: number;
+  teamId?: number;
+  userId?: number;
+}
 
 export interface TeamSnap {
   browserLogout();
@@ -356,7 +406,7 @@ export interface TeamSnap {
   loadAvailabilities(
     params: LoadAvailabilitiesParams
   ): Promise<TeamSnapAvailability[]>;
-  loadContacts(params: { teamId: number }): Promise<TeamSnapContact[]>;
+  loadContacts(params: LoadContactsParams): Promise<TeamSnapContact[]>;
   loadEvents(params: LoadEventsParams): Promise<TeamSnapEvent[]>;
   loadHealthCheckQuestionnaires(
     params: LoadHealthCheckQuestionnairesParams
@@ -369,4 +419,9 @@ export interface TeamSnap {
   loadContactPhoneNumbers(
     params: LoadContactPhoneNumbersParams
   ): TeamSnapContactPhoneNumber[];
+  loadMemberPhoneNumbers(params: {
+    memberId: number;
+  }): Promise<TeamSnapMemberPhoneNumber[]>;
+
+  loadMemberEmailAddresses(param: LoadMemberEmailAddressesParams): [];
 }

@@ -10,6 +10,9 @@
   "dependencies": {
     "@types/lodash": "^4.14.161",
     "date-fns": "^2.16.1",
+    "fetch-retry": "^4.0.1",
+    "firebase": "^7.21.1",
+    "firebase-admin": "^9.2.0",
     "http-proxy-middleware": "^1.0.5",
     "lodash": "^4.17.20",
     "next": "9.5.1",

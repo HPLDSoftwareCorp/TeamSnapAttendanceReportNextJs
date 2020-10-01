@@ -1,4 +1,4 @@
-import createProxy from "lib/createProxy";
+import createProxy from "lib/server/createProxy";
 
 export const config = {
   api: {
