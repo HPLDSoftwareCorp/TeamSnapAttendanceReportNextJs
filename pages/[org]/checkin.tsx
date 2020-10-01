@@ -1,4 +1,4 @@
-import React, { ChangeEventHandler, useState } from "react";
+import React, { useState } from "react";
 import { useAsync } from "react-async";
 import {
   TeamSnapEvent,
@@ -63,6 +63,7 @@ const healthQuestionList = [
     <h3>Have you been asked by public health to self-isolate?</h3>
   </>,
 ];
+
 export default function Checkin() {
   const router = useRouter();
   const lookAheadHours = Number(router.query.hours || 8);
