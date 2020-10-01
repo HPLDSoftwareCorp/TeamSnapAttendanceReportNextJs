@@ -12,23 +12,25 @@
   display: flex;
   flex-direction: column;
   max-width: 1024px;
-  min-width: 480px;
-  width: 100%;
 }
 
-.main h3,
-.main label {
+.main > h3,
+.main > label,
+.main > label,
+div.field {
   font-size: 18px;
   font-weight: 500;
   margin-top: 1em;
 }
 
-.main label {
+.main > label,
+div.field {
   display: flex;
   flex-direction: column;
 }
 
-.main label input {
+.main > label > input,
+.main > div.field > input {
   display: block;
   margin-top: 0.5em;
 }
@@ -62,7 +64,12 @@ table.eventPickerTable label {
 .quickList {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   margin: 0.5em 0;
+}
+
+.quickList p {
+  font-weight: normal;
 }
 
 .quickList label {
@@ -73,6 +80,7 @@ table.eventPickerTable label {
 
 .quickList label input {
   margin: 0 1em;
+  overflow-x: auto;
 }
 
 .healthCheckPass,
@@ -81,7 +89,7 @@ table.eventPickerTable label {
   flex-direction: column;
   justify-items: center;
   border-radius: 20px;
-  padding: 2em;
+  padding: 8px;
   font-size: 32px;
 }
 
@@ -96,6 +104,25 @@ table.eventPickerTable label {
 .healthCheckPass h2,
 .healthCheckNoPass h2 {
   font-size: 32px;
+  text-align: center;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.healthCheckPass h3,
+.healthCheckNoPass h3 {
+  font-size: 24px;
+  text-align: center;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.healthCheckPass p,
+.healthCheckNoPass p {
+  font-size: 18px;
+  font-weight: normal;
   text-align: center;
   padding: 0;
   margin: 0;
