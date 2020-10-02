@@ -94,6 +94,8 @@ export default async function checkin(
       console.log(parsed.toString(), res.status, res.statusText);
     }
     res.statusCode = 200;
-    res.end();
+  } else {
+    res.statusCode = 405;
   }
+  res.end();
 }
