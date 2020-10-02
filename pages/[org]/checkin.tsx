@@ -83,7 +83,10 @@ export default function Checkin() {
     null
   );
   const locationParam = String(router.query.location || "");
-  const [eventLocation, setEventLocation] = useState<string>(locationParam);
+  const [eventLocationState, setEventLocation] = useState<string>(
+    locationParam
+  );
+  const eventLocation = locationParam || eventLocationState;
   const [eventDate, setEventDate] = useState<string>(
     formatDate(new Date(), "yyyy-MM-dd")
   );
@@ -109,12 +112,17 @@ export default function Checkin() {
       startDate,
       endDate
     ),
+    initialValue: [],
   });
   const leagues = Array.from(
     new Set(activeTeams.map((t) => t.leagueName))
   ).filter(Boolean);
 
-  const events = eventsState.data || [];
+  const events = locationParam
+    ? eventsState.data.filter(
+        (e) => e.locationName.toLowerCase() === locationParam.toLowerCase()
+      )
+    : eventsState.data;
 
   const quickUpcomingIceTimes = [];
   for (
