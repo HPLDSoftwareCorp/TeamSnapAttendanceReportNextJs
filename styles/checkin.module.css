@@ -9,9 +9,11 @@
 
 .main {
   flex: 1;
+  font-size: 18px;
+  line-height: 1.5;
   display: flex;
   flex-direction: column;
-  max-width: 1024px;
+  max-width: 575px;
   padding: 10px;
 }
 
