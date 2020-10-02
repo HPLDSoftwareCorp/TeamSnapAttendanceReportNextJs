@@ -66,7 +66,7 @@ const healthQuestionList = [
 
 export default function Checkin() {
   const router = useRouter();
-  const org = router.query.org || "";
+  const org = String(router.query.org);
   const lookAheadHours = Number(router.query.hours || 8);
   const startDate = roundToNearestMinutes(subHours(Date.now(), 1), {
     nearestTo: 30,
@@ -82,8 +82,8 @@ export default function Checkin() {
   const [teamSnapEvent, setTeamSnapEvent] = useState<TeamSnapEvent | null>(
     null
   );
-  const [memberIds, setMemberIds] = useState<number[] | null>(null);
-  const [eventLocation, setEventLocation] = useState<string>("");
+  const locationParam = String(router.query.location || "");
+  const [eventLocation, setEventLocation] = useState<string>(locationParam);
   const [eventDate, setEventDate] = useState<string>(
     formatDate(new Date(), "yyyy-MM-dd")
   );
@@ -182,13 +182,13 @@ export default function Checkin() {
       const members = await Promise.all(
         contacts.map((c) => c.loadItem("member"))
       );
-      setMemberIds(members.map((m) => m.id));
       setAttendeeNames(
         Array.from(
           new Set(
-            [...contacts, ...members, user].map((c) =>
-              [c.firstName, c.lastName].filter(Boolean).join(" ")
-            )
+            (members.length
+              ? (members as Array<{ firstName: string; lastName: string }>)
+              : (contacts as Array<{ firstName: string; lastName: string }>)
+            ).map((c) => [c.firstName, c.lastName].filter(Boolean).join(" "))
           )
         ).join(", ")
       );
@@ -368,7 +368,7 @@ export default function Checkin() {
             <label className={styles.field}>
               Location
               <input
-                disabled={!!teamSnapEvent}
+                disabled={!!(teamSnapEvent || locationParam)}
                 value={eventLocation}
                 onChange={(e) => setEventLocation(e.target.value)}
               />
