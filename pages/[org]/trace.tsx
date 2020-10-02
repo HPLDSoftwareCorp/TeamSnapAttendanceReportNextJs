@@ -49,7 +49,7 @@ function AllOrNone<T>({
   );
 }
 
-export default function BulkAttendanceReport() {
+export default function Trace() {
   const [selectedTeams, setSelectedTeams] = useState<number[]>([]);
   const [agreed, setAgreed] = useState<boolean>(
     !!(process.browser && sessionStorage.agreedToTerms)
