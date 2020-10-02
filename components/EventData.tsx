@@ -5,20 +5,22 @@ import {
   TeamSnapEvent,
   TeamSnapHealthCheckQuestionnaire,
   TeamSnapTeam,
-} from "lib/teamsnap/TeamSnap";
-import loadAvailabilities from "lib/teamsnap/loadAvailabilities";
+} from "lib/client/teamsnap/TeamSnap";
+import loadAvailabilities from "lib/client/teamsnap/loadAvailabilities";
 import { useAsync } from "react-async";
-import loadHealthCheckQuestionnaires from "lib/teamsnap/loadHealthCheckQuestionnaires";
-import loadContacts from "lib/teamsnap/loadTeamContacts";
-import formatTeamLabel from "lib/teamsnap/formatTeamLabel";
+import loadHealthCheckQuestionnaires from "lib/client/teamsnap/loadHealthCheckQuestionnaires";
+import loadContacts from "lib/client/teamsnap/loadTeamContacts";
+import formatTeamLabel from "lib/client/teamsnap/formatTeamLabel";
 import styles from "styles/EventData.module.css";
-import loadContactEmailAddressesForTeam from "lib/teamsnap/loadContactEmailAddressesForTeam";
-import loadContactPhoneNumbersForTeam from "lib/teamsnap/loadContactPhoneNumbersForTeam";
+import loadContactEmailAddressesForTeam from "lib/client/teamsnap/loadContactEmailAddressesForTeam";
+import loadContactPhoneNumbersForTeam from "lib/client/teamsnap/loadContactPhoneNumbersForTeam";
 import formatDate from "date-fns/format";
-import loadMembers from "lib/teamsnap/loadMembers";
+import loadMembers from "lib/client/teamsnap/loadMembers";
+import fetchFormCheckins from "lib/client/fetchFormCheckins";
 
 export interface EventDataProps {
   event: TeamSnapEvent;
+  org: string;
   team: TeamSnapTeam;
   onlyAttendees: boolean;
 }
@@ -43,6 +45,7 @@ const formatAvailability = (
 export default function EventData({
   event,
   team,
+  org,
   onlyAttendees,
 }: EventDataProps) {
   let teamId = team.id;
@@ -69,6 +72,12 @@ export default function EventData({
   const hcqState = useAsync({
     promise: loadHealthCheckQuestionnaires(event),
   });
+  const { isPending: checkinsPending, data: checkins = [] } = useAsync({
+    promise: fetchFormCheckins(event.id, org),
+    initialValue: [],
+  });
+
+  console.log({ checkins });
   const hcqs = hcqState.data || [];
   const pending: string[] = [];
   if (membersState.isPending) pending.push("members");
@@ -77,6 +86,7 @@ export default function EventData({
   if (hcqState.isPending) pending.push("health check questionnaires");
   if (phoneNumbersState.isPending) pending.push("phone numbers");
   if (emailAddressesState.isPending) pending.push("email addresses");
+  if (checkinsPending) pending.push("non-TeamSnap checkins");
   if (pending.length) {
     return <div>Loading {pending.join(", ")} ...</div>;
   }
@@ -213,11 +223,20 @@ export default function EventData({
                   </td>
                   <td>{phoneNumbers.join(", ")}</td>
                   <td>{emails.join(", ")}</td>
-                  <td>{formatAvailability(availability, hcq)}</td>
+                  <td>{formatAvailability(availability, hcq)} </td>
                 </tr>
               );
             }
           )}
+          {checkins.map((ci, n) => (
+            <tr key={n}>
+              <td>{ci.memberName}</td>
+              <td>{ci.contactName}</td>
+              <td>{ci.contactPhoneNumbers.join(", ")}</td>
+              <td>{ci.contactEmails.join(", ")}</td>
+              <td>{ci.passed ? <b>&#9745;</b> : <b>&#9888;</b>}</td>
+            </tr>
+          ))}
           <tr>
             <td colSpan={6} className={styles.notes}>
               <label>

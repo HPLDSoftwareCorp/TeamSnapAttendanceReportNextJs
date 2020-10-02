@@ -1,4 +1,4 @@
-import { TeamSnapUser } from "../lib/teamsnap/TeamSnap";
+import { TeamSnapUser } from "../lib/client/teamsnap/TeamSnap";
 import React from "react";
 
 export interface ErrorBoxProps {

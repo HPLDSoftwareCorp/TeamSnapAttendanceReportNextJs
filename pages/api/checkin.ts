@@ -6,7 +6,8 @@ import axios from "axios";
 
 const checkinSchema: JSONSchema7 = {
   properties: {
-    attendeeNames: { type: "string" },
+    memberName: { type: "string" },
+    contactName: { type: "string" },
     contactPhoneNumbers: {
       type: "array",
       items: {
@@ -29,7 +30,7 @@ const checkinSchema: JSONSchema7 = {
     timestamp: { type: "string", format: "date-time" },
   },
   required: [
-    "attendeeNames",
+    "memberName",
     "contactPhoneNumbers",
     "contactEmails",
     "eventLocation",
@@ -52,6 +53,7 @@ export default async function checkin(
     res.end();
     return;
   }
+  const { org, timestamp } = req.body;
   if (!ajv.validate(checkinSchema, req.body)) {
     res.statusCode = 400;
     res.end(ajv.errorsText());
@@ -60,9 +62,9 @@ export default async function checkin(
   const admin = initFirebaseAdmin();
   const firestore = admin.firestore();
   const orgsCollection = firestore.collection("orgs");
-  const orgDoc = orgsCollection.doc(req.body.org);
-  const org = await orgDoc.get();
-  if (!org) {
+  const orgDoc = orgsCollection.doc(org);
+  const orgData = await orgDoc.get();
+  if (!orgData) {
     res.statusCode = 404;
     res.end("No such org: " + org);
     return;
@@ -70,15 +72,16 @@ export default async function checkin(
   const checkinsCollection = orgDoc.collection("checkins");
   await checkinsCollection.add({
     ...req.body,
-    timestamp: new Date(req.body.timestamp),
+    timestamp: new Date(timestamp),
   });
-  const formUrl = org.get("googleFormUrl");
+  const formUrl = orgData.get("googleFormUrl");
   if (formUrl) {
     const parsed = new URL(formUrl);
     parsed.pathname = parsed.pathname.replace("/viewform", "/formResponse");
     const qs = parsed.searchParams;
     const subs = {
-      attendeeNames: req.body.attendeeNames,
+      memberName: req.body.memberName,
+      contactName: req.body.contactName,
       contactPhoneNumber: req.body.contactPhoneNumbers.join(", "),
       contactEmail: req.body.contactEmails.join(", "),
       eventLocation: req.body.eventLocation,

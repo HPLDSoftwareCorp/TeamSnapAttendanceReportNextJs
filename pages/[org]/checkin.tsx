@@ -4,9 +4,9 @@ import {
   TeamSnapEvent,
   TeamSnapTeam,
   TeamSnapUser,
-} from "lib/teamsnap/TeamSnap";
-import loadMe from "lib/teamsnap/loadMe";
-import loadActiveTeams from "lib/teamsnap/loadActiveTeams";
+} from "lib/client/teamsnap/TeamSnap";
+import loadMe from "lib/client/teamsnap/loadMe";
+import loadActiveTeams from "lib/client/teamsnap/loadActiveTeams";
 import {
   addHours,
   addMinutes,
@@ -16,19 +16,19 @@ import {
 } from "date-fns";
 import styles from "styles/checkin.module.css";
 import Head from "next/head";
-import doLogout from "lib/teamsnap/doLogout";
-import doLogin from "lib/teamsnap/doLogin";
+import doLogout from "lib/client/teamsnap/doLogout";
+import doLogin from "lib/client/teamsnap/doLogin";
 import TopBar from "components/TopBar";
 import ErrorBox from "components/ErrorBox";
-import loadEventsForTeams from "../../lib/teamsnap/loadEventsForTeams";
+import loadEventsForTeams from "../../lib/client/teamsnap/loadEventsForTeams";
 import formatDate from "date-fns/format";
-import loadMemberPhoneNumbers from "../../lib/teamsnap/loadMemberPhoneNumbers";
-import loadTeamContactsForUser from "../../lib/teamsnap/loadTeamContactsForUser";
+import loadMemberPhoneNumbers from "../../lib/client/teamsnap/loadMemberPhoneNumbers";
+import loadTeamContactsForUser from "../../lib/client/teamsnap/loadTeamContactsForUser";
 import { useRouter } from "next/router";
 import YesNo from "../../components/YesNo";
-import loadContactPhoneNumbers from "../../lib/teamsnap/loadContactPhoneNumbers";
-import loadContactEmailAddresses from "../../lib/teamsnap/loadContactEmailAddresses";
-import loadMemberEmailAddresses from "../../lib/teamsnap/loadMemberEmailAddresses";
+import loadContactPhoneNumbers from "../../lib/client/teamsnap/loadContactPhoneNumbers";
+import loadContactEmailAddresses from "../../lib/client/teamsnap/loadContactEmailAddresses";
+import loadMemberEmailAddresses from "../../lib/client/teamsnap/loadMemberEmailAddresses";
 
 const healthQuestionList = [
   <>
@@ -91,7 +91,8 @@ export default function Checkin() {
     formatDate(new Date(), "yyyy-MM-dd")
   );
   const [eventTime, setEventTime] = useState<string>("");
-  const [attendeeNames, setAttendeeNames] = useState<string>("");
+  const [memberName, setMemberName] = useState<string>("");
+  const [contactName, setContactName] = useState<string>("");
   const [contactPhoneNumber, setContactPhoneNumber] = useState<string>("");
   const [contactEmail, setContactEmail] = useState<string>("");
   const [healthAnswers, setHealthAnswers] = useState<
@@ -135,7 +136,8 @@ export default function Checkin() {
 
   const addCheckin = () => {
     const results = {
-      attendeeNames,
+      memberName,
+      contactName,
       contactPhoneNumbers: contactPhoneNumber.split(/\s*,\s*/).filter(Boolean),
       contactEmails: contactEmail.split(/\s*,\s*/).filter(Boolean),
       eventLocation,
@@ -163,7 +165,7 @@ export default function Checkin() {
       alert("Please enter the date of the event");
     } else if (!contactPhoneNumber) {
       alert("Please provide a contact phone number");
-    } else if (!attendeeNames) {
+    } else if (!memberName) {
       alert("Please provide the names of the persons attending the event");
     } else {
       // TODO: Save submission data for later lookup!
@@ -190,13 +192,21 @@ export default function Checkin() {
       const members = await Promise.all(
         contacts.map((c) => c.loadItem("member"))
       );
-      setAttendeeNames(
+      setContactName(
         Array.from(
           new Set(
-            (members.length
-              ? (members as Array<{ firstName: string; lastName: string }>)
-              : (contacts as Array<{ firstName: string; lastName: string }>)
-            ).map((c) => [c.firstName, c.lastName].filter(Boolean).join(" "))
+            contacts.map((c) =>
+              [c.firstName, c.lastName].filter(Boolean).join(" ")
+            )
+          )
+        ).join(", ")
+      );
+      setMemberName(
+        Array.from(
+          new Set(
+            members.map((c) =>
+              [c.firstName, c.lastName].filter(Boolean).join(" ")
+            )
           )
         ).join(", ")
       );
@@ -235,7 +245,7 @@ export default function Checkin() {
 
   const renderSummary = () => (
     <>
-      <h2>{attendeeNames}</h2>
+      <h2>{memberName}</h2>
       <h2>
         {eventDate} {eventTime}
       </h2>
@@ -347,13 +357,32 @@ export default function Checkin() {
         {renderSummary()}
       </div>
     ) : (
-      <div className={styles.healthCheckPass}>
-        <h1>&#9745;</h1>
-        <h2>Proceed to your event</h2>
-        {renderSummary()}
-      </div>
+      <>
+        <div className={styles.healthCheckPass}>
+          <h1>&#9745;</h1>
+          <h2>Health Check Passed</h2>
+          {renderSummary()}
+        </div>
+        <p>
+          Keep this page open on your phone to show at the door. If you close it
+          accidentally you can always fill in the form again.
+        </p>
+      </>
     );
   };
+  if (submittedAt) {
+    return (
+      <div className={styles.container}>
+        <Head>
+          <title>
+            Event Check-in - {leagues.length === 1 ? leagues[0] + " - " : ""}
+            {formatDate(startDate, "yyyy-MM-dd")}
+          </title>
+        </Head>
+        <main className={styles.main}>{renderOutcome()}</main>
+      </div>
+    );
+  }
   return (
     <div className={styles.container}>
       <Head>
@@ -362,108 +391,94 @@ export default function Checkin() {
           {formatDate(startDate, "yyyy-MM-dd")}
         </title>
       </Head>
-
+      <TopBar
+        title="Contact Tracing"
+        user={user}
+        onClickLogout={() => doLogout().then(() => userState.reload())}
+      />
       <main className={styles.main}>
-        <TopBar
-          title="Contact Tracing"
-          user={user}
-          onClickLogout={() => doLogout().then(() => userState.reload())}
-        />
-        <h1>Event Check-in</h1>
-        {submittedAt ? (
-          renderOutcome()
-        ) : (
-          <>
-            {renderTeamSnapEventPicker()}
+        <>
+          <h1>Event Check-in</h1>
+          {renderTeamSnapEventPicker()}
 
-            <label className={styles.field}>
-              Location
-              <input
-                disabled={!!(teamSnapEvent || locationParam)}
-                value={eventLocation}
-                onChange={(e) => setEventLocation(e.target.value)}
-              />
-            </label>
-            <label className={styles.field}>
-              Date
-              <input
-                disabled={!!teamSnapEvent}
-                min={formatDate(startDate, "yyyy-MM-dd")}
-                max={formatDate(endDate, "yyyy-MM-dd")}
-                type="date"
-                value={eventDate}
-                onChange={(e) => setEventDate(e.target.value)}
-              />
-            </label>
-            <div className={styles.field}>
-              <label htmlFor="time-input">Time</label>
-              {!teamSnapEvent && (
-                <div className={styles.quickList}>
-                  <p>
-                    Click a time on this quick-pick list or type the exact time
-                    into the field below
-                  </p>
-                  {quickUpcomingIceTimes.map((s) => (
-                    <label key={s}>
-                      <input
-                        type="checkbox"
-                        checked={eventTime === s}
-                        onChange={() => setEventTime(s)}
-                      />
-                      {s}
-                    </label>
-                  ))}
-                </div>
-              )}
-              <input
-                disabled={!!teamSnapEvent}
-                id="time-input"
-                type="time"
-                value={eventTime}
-                onChange={(e) => setEventTime(e.target.value)}
-              />
-            </div>
-            <label className={styles.field}>
-              Names of those attending the event
-              <input
-                value={attendeeNames}
-                onChange={(e) => setAttendeeNames(e.target.value)}
-              />
-            </label>
-            <label className={styles.field}>
-              Contact phone number(s)
-              <input
-                value={contactPhoneNumber}
-                onChange={(e) => setContactPhoneNumber(e.target.value)}
-              />
-            </label>
-            <label className={styles.field}>
-              Contact email address(es)
-              <input
-                value={contactEmail}
-                onChange={(e) => setContactEmail(e.target.value)}
-              />
-            </label>
+          <label className={styles.field}>
+            Location
+            <input
+              disabled={!!(teamSnapEvent || locationParam)}
+              value={eventLocation}
+              onChange={(e) => setEventLocation(e.target.value)}
+            />
+          </label>
+          <label className={styles.field}>
+            Date
+            <input
+              disabled={!!teamSnapEvent}
+              min={formatDate(startDate, "yyyy-MM-dd")}
+              max={formatDate(endDate, "yyyy-MM-dd")}
+              type="date"
+              value={eventDate}
+              onChange={(e) => setEventDate(e.target.value)}
+            />
+            <p>e.g. {formatDate(new Date(), "yyyy-MM-dd")}</p>
+          </label>
+          <label>
+            Event Start Time
+            <input
+              disabled={!!teamSnapEvent}
+              id="time-input"
+              type="time"
+              value={eventTime}
+              onChange={(e) => setEventTime(e.target.value)}
+            />
+            <p>e.g. {formatDate(new Date(), "HH:mm b")}</p>
+          </label>
+          <label className={styles.field}>
+            Player Full Name
+            <input
+              value={memberName}
+              onChange={(e) => setMemberName(e.target.value)}
+            />
+          </label>
+          <label className={styles.field}>
+            Parent / Emergency Contact Name
+            <input
+              value={contactName}
+              onChange={(e) => setContactName(e.target.value)}
+            />
+          </label>
+          <label className={styles.field}>
+            Contact phone number(s)
+            <input
+              value={contactPhoneNumber}
+              onChange={(e) => setContactPhoneNumber(e.target.value)}
+            />
             <p>
-              If you provide your email address we can send you a copy of your
-              submission.
+              e.g. <i>778-123-4567, 604-299-2999</i>
             </p>
-            {healthQuestionList.map((q, n) => (
-              <div key={`question-${n}`} className={styles.healthQuestion}>
-                {q}
-                <YesNo
-                  value={healthAnswers[n]}
-                  onChange={(e) =>
-                    setHealthAnswer(n, e.target.value === "true")
-                  }
-                />
-              </div>
-            ))}
-            <div className={styles.formEnd}>
-              <button onClick={onClickSubmit}>Submit</button>
+          </label>
+          <label className={styles.field}>
+            Contact email address(es)
+            <input
+              value={contactEmail}
+              onChange={(e) => setContactEmail(e.target.value)}
+            />
+            <p>
+              e.g. <i>hector@example.org, maria@example.org</i>
+            </p>
+          </label>
+          {healthQuestionList.map((q, n) => (
+            <div key={`question-${n}`} className={styles.healthQuestion}>
+              {q}
+              <YesNo
+                value={healthAnswers[n]}
+                onChange={(e) => setHealthAnswer(n, e.target.value === "true")}
+              />
             </div>
-          </>
-        )}
+          ))}
+          <div className={styles.formEnd}>
+            <button onClick={onClickSubmit}>Submit</button>
+          </div>
+        </>
       </main>
 
       <footer className={styles.footer}>

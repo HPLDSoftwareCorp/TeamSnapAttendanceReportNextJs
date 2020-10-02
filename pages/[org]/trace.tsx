@@ -1,21 +1,21 @@
 import Head from "next/head";
-import styles from "styles/BulkAttendanceReport.module.css";
-import doLogin from "lib/teamsnap/doLogin";
+import styles from "styles/trace.module.css";
+import doLogin from "lib/client/teamsnap/doLogin";
 import { useAsync } from "react-async";
-import loadMe from "lib/teamsnap/loadMe";
-import doLogout from "lib/teamsnap/doLogout";
-import loadActiveTeams from "lib/teamsnap/loadActiveTeams";
+import loadMe from "lib/client/teamsnap/loadMe";
+import doLogout from "lib/client/teamsnap/doLogout";
+import loadActiveTeams from "lib/client/teamsnap/loadActiveTeams";
 import {
   TeamSnapEvent,
   TeamSnapTeam,
   TeamSnapUser,
-} from "lib/teamsnap/TeamSnap";
-import loadEventsForTeams from "lib/teamsnap/loadEventsForTeams";
+} from "lib/client/teamsnap/TeamSnap";
+import loadEventsForTeams from "lib/client/teamsnap/loadEventsForTeams";
 import { useState } from "react";
 import xor from "lodash/xor";
 import React from "react";
 import EventData from "components/EventData";
-import formatTeamLabel from "lib/teamsnap/formatTeamLabel";
+import formatTeamLabel from "lib/client/teamsnap/formatTeamLabel";
 import subWeeks from "date-fns/subWeeks";
 import startOfWeek from "date-fns/startOfWeek";
 import isBefore from "date-fns/isBefore";
@@ -24,6 +24,7 @@ import areIntervalsOverlapping from "date-fns/areIntervalsOverlapping";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
 import TopBar from "components/TopBar";
+import { useRouter } from "next/router";
 
 function AllOrNone<T>({
   options,
@@ -50,6 +51,8 @@ function AllOrNone<T>({
 }
 
 export default function Trace() {
+  const router = useRouter();
+  const org = String(router.query.org);
   const [selectedTeams, setSelectedTeams] = useState<number[]>([]);
   const [agreed, setAgreed] = useState<boolean>(
     !!(process.browser && sessionStorage.agreedToTerms)
@@ -66,7 +69,7 @@ export default function Trace() {
   const [startDate, setStartDate] = useState<Date>(
     startOfWeek(subWeeks(Date.now(), 1))
   );
-  const [endDate, setEndDate] = useState<Date>(endOfWeek(startDate));
+  const [endDate, setEndDate] = useState<Date>(endOfWeek(Date.now()));
   const userState = useAsync<TeamSnapUser | null>(loadMe);
   const user = userState.data;
   const teamsState = useAsync<TeamSnapTeam[]>({
@@ -261,6 +264,7 @@ export default function Trace() {
                           <EventData
                             key={event.id}
                             event={event}
+                            org={org}
                             team={teamMap.get(event.teamId)}
                             onlyAttendees={onlyAttendees}
                           />

@@ -1,6 +1,6 @@
 .container {
   min-height: 100vh;
-  padding: 0 0.5rem;
+  padding: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -12,6 +12,7 @@
   display: flex;
   flex-direction: column;
   max-width: 1024px;
+  padding: 10px;
 }
 
 .main > h3,
@@ -33,6 +34,13 @@ div.field {
 .main > div.field > input {
   display: block;
   margin-top: 0.5em;
+  max-width: 20em;
+}
+
+.main > label > p,
+.main > div.field > p {
+  font-size: 14px;
+  font-weight: normal;
 }
 
 table.eventPickerTable label {
@@ -59,28 +67,6 @@ table.eventPickerTable label {
   margin: 1em;
   padding: 1em;
   text-align: center;
-}
-
-.quickList {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin: 0.5em 0;
-}
-
-.quickList p {
-  font-weight: normal;
-}
-
-.quickList label {
-  display: flex;
-  flex-direction: row;
-  padding-right: 1em;
-}
-
-.quickList label input {
-  margin: 0 1em;
-  overflow-x: auto;
 }
 
 .healthCheckPass,
