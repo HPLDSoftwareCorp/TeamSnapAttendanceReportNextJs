@@ -259,10 +259,13 @@ export default function Checkin() {
       ) : eventsState.error ? (
         ErrorBox({ error: eventsState.error })
       ) : !events.length ? (
-        <p>
-          Sorry, we didn't find any events coming up in your TeamSnap account.
-          You'll have to fill in the form manually.
-        </p>
+        <>
+          <h3>Your Upcoming Events</h3>
+          <p>
+            Sorry, we didn't find any events within {lookAheadHours} hours in
+            your TeamSnap account. Please fill in the form manually.
+          </p>
+        </>
       ) : (
         <>
           <h3>Your Upcoming Events</h3>
