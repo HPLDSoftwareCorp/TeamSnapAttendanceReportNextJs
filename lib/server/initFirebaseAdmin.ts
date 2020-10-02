@@ -10,4 +10,5 @@ export default function initFirebaseAdmin() {
       databaseURL: "https://teamsnapattendancereporting.firebaseio.com",
     });
   }
+  return admin;
 }

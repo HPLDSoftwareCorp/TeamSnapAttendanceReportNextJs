@@ -9,11 +9,14 @@
   },
   "dependencies": {
     "@types/lodash": "^4.14.161",
+    "ajv": "^6.12.5",
+    "axios": "^0.20.0",
     "date-fns": "^2.16.1",
     "fetch-retry": "^4.0.1",
     "firebase": "^7.21.1",
     "firebase-admin": "^9.2.0",
     "http-proxy-middleware": "^1.0.5",
+    "json-schema": "^0.2.5",
     "lodash": "^4.17.20",
     "next": "9.5.1",
     "react": "16.13.1",
@@ -21,6 +24,7 @@
     "react-dom": "16.13.1"
   },
   "devDependencies": {
+    "@types/json-schema": "^7.0.6",
     "@types/node": "^14.11.1",
     "@types/react": "^16.9.49",
     "prettier": "^2.1.2",

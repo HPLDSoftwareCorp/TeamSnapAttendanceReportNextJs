@@ -66,6 +66,7 @@ const healthQuestionList = [
 
 export default function Checkin() {
   const router = useRouter();
+  const org = router.query.org || "";
   const lookAheadHours = Number(router.query.hours || 8);
   const startDate = roundToNearestMinutes(subHours(Date.now(), 1), {
     nearestTo: 30,
@@ -78,7 +79,10 @@ export default function Checkin() {
   const teamsState = useAsync<TeamSnapTeam[]>({
     promise: user && loadActiveTeams(user),
   });
-  const [eventId, setEventId] = useState<number | null>(null);
+  const [teamSnapEvent, setTeamSnapEvent] = useState<TeamSnapEvent | null>(
+    null
+  );
+  const [memberIds, setMemberIds] = useState<number[] | null>(null);
   const [eventLocation, setEventLocation] = useState<string>("");
   const [eventDate, setEventDate] = useState<string>(
     formatDate(new Date(), "yyyy-MM-dd")
@@ -121,6 +125,27 @@ export default function Checkin() {
     quickUpcomingIceTimes.push(formatDate(time, "HH:mm"));
   }
 
+  const addCheckin = () => {
+    const results = {
+      attendeeNames,
+      contactPhoneNumbers: contactPhoneNumber.split(/\s*,\s*/).filter(Boolean),
+      contactEmails: contactEmail.split(/\s*,\s*/).filter(Boolean),
+      eventLocation,
+      eventDate,
+      eventTime,
+      org,
+      passed: !healthAnswers.some((a) => a !== false),
+      teamSnapEventId: teamSnapEvent?.id,
+      teamSnapTeamId: teamSnapEvent?.teamId,
+      timestamp: new Date().toISOString(),
+    };
+    return fetch("/api/checkin", {
+      method: "post",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(results),
+    });
+  };
+
   const onClickSubmit = async () => {
     if (!eventLocation) {
       alert("Please enter the location of the event");
@@ -134,47 +159,22 @@ export default function Checkin() {
       alert("Please provide the names of the persons attending the event");
     } else {
       // TODO: Save submission data for later lookup!
-      setSubmittedAt(new Date());
-      let formUrl = process.env.NEXT_PUBLIC_SUBMISSIONS_GOOGLE_FORM_URL;
-      if (formUrl) {
-        const parsed = new URL(formUrl);
-        parsed.protocol = location.protocol;
-        parsed.pathname = [
-          "/api/proxy/",
-          parsed.hostname,
-          parsed.pathname.replace("/viewform", "/formResponse"),
-        ].join("");
-        parsed.host = location.host;
-        const qs = parsed.searchParams;
-        const subs = {
-          attendeeNames,
-          contactPhoneNumber,
-          contactEmail,
-          eventLocation,
-          eventDate,
-          eventTime,
-          pass: healthAnswers.some((a) => a !== false) ? "Fail" : "Pass",
-        };
-        for (const [k, v] of Array.from(qs.entries())) {
-          const sub = subs[v];
-          if (sub) {
-            qs.set(k, sub);
-          }
-        }
-        qs.set("submit", "Submit");
-        console.log(parsed.toString());
-        fetch(parsed.toString()).catch((e) => {
+      const timestamp = new Date();
+
+      await addCheckin().then(
+        () => setSubmittedAt(timestamp),
+        (e) => {
           console.error(e);
           alert(
-            "There was a problem saving your contact information to Google Sheets.  Please try again."
+            "There was a problem saving your submission.\nPlease try again or work with the health person to find another way."
           );
-        });
-      }
+        }
+      );
     }
   };
 
   const onClickTeamSnapEvent = (evt: TeamSnapEvent) => {
-    setEventId(evt.id);
+    setTeamSnapEvent(evt);
     setEventLocation(evt.locationName);
     setEventDate(formatDate(evt.startDate, "yyyy-MM-dd"));
     setEventTime(formatDate(evt.startDate, "HH:mm"));
@@ -182,6 +182,7 @@ export default function Checkin() {
       const members = await Promise.all(
         contacts.map((c) => c.loadItem("member"))
       );
+      setMemberIds(members.map((m) => m.id));
       setAttendeeNames(
         Array.from(
           new Set(
@@ -281,7 +282,7 @@ export default function Checkin() {
                     <td>
                       <input
                         type="checkbox"
-                        checked={eventId === evt.id}
+                        checked={teamSnapEvent?.id === evt.id}
                         id={eltId}
                         onChange={() => onClickTeamSnapEvent(evt)}
                         value={evt.id}
@@ -367,7 +368,7 @@ export default function Checkin() {
             <label className={styles.field}>
               Location
               <input
-                disabled={!!eventId}
+                disabled={!!teamSnapEvent}
                 value={eventLocation}
                 onChange={(e) => setEventLocation(e.target.value)}
               />
@@ -375,7 +376,7 @@ export default function Checkin() {
             <label className={styles.field}>
               Date
               <input
-                disabled={!!eventId}
+                disabled={!!teamSnapEvent}
                 min={formatDate(startDate, "yyyy-MM-dd")}
                 max={formatDate(endDate, "yyyy-MM-dd")}
                 type="date"
@@ -385,7 +386,7 @@ export default function Checkin() {
             </label>
             <div className={styles.field}>
               <label htmlFor="time-input">Time</label>
-              {!eventId && (
+              {!teamSnapEvent && (
                 <div className={styles.quickList}>
                   <p>
                     Click a time on this quick-pick list or type the exact time
@@ -404,7 +405,7 @@ export default function Checkin() {
                 </div>
               )}
               <input
-                disabled={!!eventId}
+                disabled={!!teamSnapEvent}
                 id="time-input"
                 type="time"
                 value={eventTime}
