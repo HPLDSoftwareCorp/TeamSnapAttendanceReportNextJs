@@ -127,6 +127,12 @@ table.eventPickerTable label {
   background-color: #f00;
 }
 
+.dateWarning {
+  border: 5px solid red;
+  border-radius: 10px;
+  padding: 10px;
+}
+
 @media print {
   .quickList {
     display: none !important;

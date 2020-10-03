@@ -7,13 +7,7 @@ import {
 } from "lib/client/teamsnap/TeamSnap";
 import loadMe from "lib/client/teamsnap/loadMe";
 import loadActiveTeams from "lib/client/teamsnap/loadActiveTeams";
-import {
-  addHours,
-  addMinutes,
-  isSameDay,
-  roundToNearestMinutes,
-  subHours,
-} from "date-fns";
+import { addHours, isSameDay, subHours } from "date-fns";
 import styles from "styles/checkin.module.css";
 import Head from "next/head";
 import doLogout from "lib/client/teamsnap/doLogout";
@@ -70,12 +64,9 @@ export default function Checkin() {
   const router = useRouter();
   const org = String(router.query.org);
   const lookAheadHours = Number(router.query.hours || 8);
-  const startDate = roundToNearestMinutes(subHours(Date.now(), 1), {
-    nearestTo: 30,
-  });
-  const endDate = roundToNearestMinutes(addHours(Date.now(), lookAheadHours), {
-    nearestTo: 30,
-  });
+  const lookBackHours = Number(router.query.hours || 1);
+  const startDate = subHours(Date.now(), lookBackHours);
+  const endDate = addHours(Date.now(), lookAheadHours);
   const userState = useAsync<TeamSnapUser | null>(loadMe);
   const user = userState.data;
   const teamsState = useAsync<TeamSnapTeam[]>({
@@ -127,21 +118,13 @@ export default function Checkin() {
       )
     : eventsState.data;
 
-  const quickUpcomingIceTimes = [];
-  for (
-    let time = roundToNearestMinutes(new Date(), { nearestTo: 15 });
-    time < endDate && quickUpcomingIceTimes.length < 8;
-    time = addMinutes(time, 15)
-  ) {
-    quickUpcomingIceTimes.push(formatDate(time, "HH:mm"));
-  }
+  const eventTimestamp = parseDate(
+    [eventDate, eventTime].join(" "),
+    "yyyy-MM-dd HH:mm",
+    new Date()
+  );
 
   const addCheckin = () => {
-    const eventTimestamp = parseDate(
-      [eventDate, eventTime].join(" "),
-      "yyyy-MM-dd HH:mm",
-      new Date()
-    );
     console.log(
       { eventDate, eventTime, eventTimestamp },
       [eventDate, eventTime].join(" "),
@@ -181,6 +164,15 @@ export default function Checkin() {
       alert("Please provide a contact phone number");
     } else if (!memberName) {
       alert("Please provide the names of the persons attending the event");
+    } else if (eventTimestamp < startDate) {
+      alert("That event is too far in the past");
+    } else if (eventTimestamp > endDate) {
+      alert(
+        `That event is too far in the future, please try again after ${subHours(
+          eventTimestamp,
+          lookAheadHours
+        ).toLocaleString()}`
+      );
     } else {
       // TODO: Save submission data for later lookup!
       const timestamp = new Date();
@@ -446,6 +438,17 @@ export default function Checkin() {
             />
             <p>e.g. {formatDate(new Date(), "HH:mm b")}</p>
           </label>
+          {eventTimestamp > endDate ? (
+            <p className={styles.dateWarning}>
+              You can only use this form to check into an event less than{" "}
+              {lookAheadHours} hours in the future
+            </p>
+          ) : eventTimestamp < startDate ? (
+            <p className={styles.dateWarning}>
+              You can only use this form to check into an event less than{" "}
+              {lookBackHours} hours in the past
+            </p>
+          ) : null}
           <label className={styles.field}>
             Player Full Name
             <input
