@@ -123,8 +123,8 @@ table.eventPickerTable label {
 }
 
 .healthCheckNoPass {
-  border: 10px solid #ffc;
-  background-color: #ffe;
+  border: 10px solid #800;
+  background-color: #f00;
 }
 
 @media print {
