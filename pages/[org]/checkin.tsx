@@ -34,7 +34,8 @@ import loadMemberEmailAddresses from "../../lib/client/teamsnap/loadMemberEmailA
 const healthQuestionList = [
   <>
     <h3>
-      Are you experiencing cold, flu or COVID-19-like symptoms, even mild ones?
+      Are you experiencing cold, flu or COVID-19-like symptoms, even mild ones,
+      not explained by pre-existing conditions such as allergies or asthma?
     </h3>
     <p>
       Symptoms include: Fever*, chills, cough or worsening of chronic cough,
@@ -366,7 +367,7 @@ export default function Checkin() {
     return healthAnswers.some((ans) => ans !== false) ? (
       <div className={styles.healthCheckNoPass}>
         <h1>&#9888;</h1>
-        <h2>Check with the health person for instructions</h2>
+        <h2>Stay Home</h2>
         {renderSummary()}
       </div>
     ) : (
