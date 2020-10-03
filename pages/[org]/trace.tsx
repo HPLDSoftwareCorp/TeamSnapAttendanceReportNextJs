@@ -65,7 +65,7 @@ export default function Trace() {
         ? loadTeamsForDivisions(selectedDivisions)
         : loadActiveTeams(user)),
   });
-  const activeTeams = teamsState.data || [];
+  const teams = teamsState.data || [];
   const eventsState = useAsync<TeamSnapEvent[]>({
     promise: loadEventsForTeams(selectedTeams, startDate, endDate),
   });
@@ -85,12 +85,16 @@ export default function Trace() {
   const matchedEvents = events.filter((event) =>
     selectedLocations.includes(event.locationName)
   );
-  const teamMap = new Map<number, TeamSnapTeam>(
-    activeTeams.map((t) => [t.id, t])
+  const teamMap = new Map<number, TeamSnapTeam>(teams.map((t) => [t.id, t]));
+  const leagues = Array.from(new Set(teams.map((t) => t.leagueName))).filter(
+    Boolean
   );
-  const leagues = Array.from(
-    new Set(activeTeams.map((t) => t.leagueName))
-  ).filter(Boolean);
+
+  const managedTeamIds = new Set([
+    ...(user?.commissionedTeamIds || []),
+    ...(user?.managedTeamIds || []),
+    ...(user?.ownedTeamIds || []),
+  ]);
 
   return (
     <div className={styles.container}>
@@ -171,7 +175,8 @@ export default function Trace() {
                           checked={onlyAttendees}
                           onChange={() => setOnlyAttendees(!onlyAttendees)}
                         />{" "}
-                        Only show contacts with availability YES or Health Check Pass
+                        Only show contacts with availability YES or Health Check
+                        Pass
                       </label>
                     </td>
                   </tr>
@@ -207,19 +212,27 @@ export default function Trace() {
                     </ul>
                   </>
                 )}
-                {activeTeams.length ? (
+                {teams.length ? (
                   <>
-                    <h3>Teams ({activeTeams.length})</h3>
+                    <h3>Teams ({teams.length})</h3>
                     <ul className={styles.checkboxes}>
-                      {activeTeams.map((team) => (
+                      {teams.map((team) => (
                         <li key={team.id}>
                           <label>
                             <input
                               checked={selectedTeams.includes(team.id)}
+                              disabled={!managedTeamIds.has(team.id)}
                               type="checkbox"
                               onChange={() => toggleTeam(team.id)}
                             />
                             <strong>{formatTeamLabel(team)}</strong>
+                            {!managedTeamIds.has(team.id) && (
+                              <i>
+                                {" "}
+                                - you cannot get a report for this team because
+                                you are not marked as a manager for it
+                              </i>
+                            )}
                           </label>
                         </li>
                       ))}
