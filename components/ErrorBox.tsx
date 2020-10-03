@@ -5,7 +5,7 @@ export interface ErrorBoxProps {
   error: Error | any;
 }
 
-export default function ErrorBox({ error }) {
+export default function ErrorBox({ error }: ErrorBoxProps) {
   return (
     <div>
       <h3>Error</h3>
