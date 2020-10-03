@@ -77,7 +77,6 @@ export default function EventData({
   });
   const { isPending: checkinsPending, data: checkins = [] } = checkinsState;
 
-  console.log({ checkins });
   const hcqs = hcqState.data || [];
   const asyncStates = {
     members: membersState,
