@@ -80,17 +80,19 @@ export default function EventData({
 
   console.log({ checkins });
   const hcqs = hcqState.data || [];
-  const pending: string[] = [];
-  if (membersState.isPending) pending.push("members");
-  if (contactsState.isPending) pending.push("contacts");
-  if (availabilitiesState.isPending) pending.push("availabilities");
-  if (hcqState.isPending) pending.push("health check questionnaires");
-  if (phoneNumbersState.isPending) pending.push("phone numbers");
-  if (emailAddressesState.isPending) pending.push("email addresses");
-  if (checkinsPending) pending.push("non-TeamSnap checkins");
-  if (pending.length) {
-    return <div>Loading {pending.join(", ")} ...</div>;
-  }
+  const asyncStates = {
+    members: membersState,
+    contacts: contactsState,
+    availabilities: availabilitiesState,
+    "health check questionnaires": hcqState,
+    "phone numbers": phoneNumbersState,
+    "email addresses": emailAddressesState,
+    "web form submissions": checkinsState,
+  };
+
+  const pending: string[] = Object.keys(asyncStates).filter(
+    (k) => asyncStates[k].isPending
+  );
   const error =
     membersState.error ||
     contactsState.error ||
@@ -136,14 +138,15 @@ export default function EventData({
     : members;
   const contactMap = groupByMemberId(contacts);
   const refresh = () => {
+    console.log("Reloading...");
     loadMembers.cache.delete(String(teamId));
     loadContacts.cache.delete(String(teamId));
     loadAvailabilities.cache.delete(String(event.id));
     loadHealthCheckQuestionnaires.cache.delete(String(teamId));
     fetchFormCheckins.cache.delete([event.id, org].join(", "));
-    availabilitiesState.reload();
-    hcqState.reload();
-    checkinsState.reload();
+    for (const state of Object.values(asyncStates)) {
+      state.reload();
+    }
   };
   return (
     <div className={styles.container}>
@@ -270,7 +273,11 @@ export default function EventData({
         </div>
       )}
       <div>
-        <button onClick={refresh}>Refresh Contact List</button>
+        {!!pending.length ? (
+          <>Loading {pending.join(", ")} ...</>
+        ) : (
+          <button onClick={refresh}>Reload Contacts</button>
+        )}
       </div>
     </div>
   );
