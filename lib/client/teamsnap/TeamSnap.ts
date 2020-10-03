@@ -1,5 +1,51 @@
 export interface LoadTeamsParams {
-  userId: number;
+  divisionId?: number;
+  userId?: number;
+}
+
+export interface TeamSnapDivision {
+  activeChildrenCount: number;
+  activeDescendantsCount: number;
+  activePaymentProvider: string;
+  activeTeamsCount: number;
+  allChildrenCount: number;
+  allTeamsCount: number;
+  billingAddress: string | null;
+  businessType: string | null;
+  country: string;
+  createdAt: Date;
+  defaultPaymentProvider: string | null;
+  formattedPersistentUuid: string;
+  href: string;
+  id: number;
+  isAncestorArchived: boolean;
+  isAncestorDisabled: boolean;
+  isArchived: boolean | null;
+  isDeletable: boolean;
+  isDisabled: boolean;
+  isPubliclyAccessible: boolean;
+  leagueName: string | null;
+  leagueUrl: string;
+  leftBoundary: number;
+  links: any;
+  locationCountry: string;
+  name: string;
+  parentDivisionName: string;
+  parentId: number;
+  persistentUuid: string;
+  planId: number;
+  postalCode: string;
+  rightBoundary: number;
+  rootId: number;
+  seasonName: string;
+  sportId: number;
+  teamsInPlan: number;
+  timeZone: string;
+  timeZoneDescription: string;
+  timeZoneIanaName: string;
+  timeZoneOffset: string;
+  type: "division";
+  updatedAt: Date;
 }
 
 export interface TeamSnapTeam {
@@ -377,6 +423,8 @@ interface LoadContactsParams {
   userId?: number;
 }
 
+export interface LoadDivisionsParams {}
+
 export interface TeamSnap {
   browserLogout(): void;
 
@@ -410,6 +458,8 @@ export interface TeamSnap {
 
   loadContacts(params: LoadContactsParams): Promise<TeamSnapContact[]>;
 
+  loadDivisions(params?: LoadDivisionsParams): Promise<TeamSnapDivision[]>;
+
   loadEvents(params: LoadEventsParams): Promise<TeamSnapEvent[]>;
 
   loadHealthCheckQuestionnaires(
@@ -440,5 +490,3 @@ declare global {
     teamsnap?: TeamSnap;
   }
 }
-
-

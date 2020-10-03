@@ -75,7 +75,10 @@ export default function EventData({
     promise: fetchFormCheckins(event.id, org),
     initialValue: [],
   });
-  const { isPending: checkinsPending, data: checkins = [] } = checkinsState;
+  const checkins =
+    onlyAttendees && checkinsState.data
+      ? checkinsState.data.filter((checkin) => checkin.passed)
+      : checkinsState.data || [];
 
   const hcqs = hcqState.data || [];
   const asyncStates = {

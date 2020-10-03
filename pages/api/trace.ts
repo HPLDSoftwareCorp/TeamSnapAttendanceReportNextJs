@@ -39,6 +39,7 @@ export default async function trace(
   const accessOk =
     !!user.ownedTeamIds?.includes(teamId) ||
     !!user.managedTeamIds?.includes(teamId) ||
+    !!user.commissionedTeamIds?.includes(teamId) ||
     !!user.isAdmin;
   if (!accessOk) {
     const adminsCollection = orgDoc.collection("admins");

@@ -6,6 +6,7 @@ import loadMe from "lib/client/teamsnap/loadMe";
 import doLogout from "lib/client/teamsnap/doLogout";
 import loadActiveTeams from "lib/client/teamsnap/loadActiveTeams";
 import {
+  TeamSnapDivision,
   TeamSnapEvent,
   TeamSnapTeam,
   TeamSnapUser,
@@ -25,35 +26,13 @@ import format from "date-fns/format";
 import parse from "date-fns/parse";
 import TopBar from "components/TopBar";
 import { useRouter } from "next/router";
-
-function AllOrNone<T>({
-  options,
-  selected,
-  setSelected,
-}: {
-  options: T[];
-  selected: T[];
-  setSelected: (value: ((prevState: T[]) => T[]) | T[]) => void;
-}) {
-  return (
-    <div className={styles.noPrint}>
-      <button
-        disabled={options.length === selected.length}
-        onClick={() => setSelected(options)}
-      >
-        All
-      </button>
-      <button disabled={!selected.length} onClick={() => setSelected([])}>
-        None
-      </button>
-    </div>
-  );
-}
+import loadDivisions from "../../lib/client/teamsnap/loadDivisions";
+import formatDivisionLabel from "../../lib/client/teamsnap/formatDivisionLabel";
+import loadTeamsForDivisions from "../../lib/client/teamsnap/loadTeamsForDivisions";
 
 export default function Trace() {
   const router = useRouter();
   const org = String(router.query.org);
-  const [selectedTeams, setSelectedTeams] = useState<number[]>([]);
   const [agreed, setAgreed] = useState<boolean>(
     !!(process.browser && sessionStorage.agreedToTerms)
   );
@@ -62,8 +41,12 @@ export default function Trace() {
     sessionStorage["agreedToTerms"] = true;
     setAgreed(true);
   };
+  const [selectedTeams, setSelectedTeams] = useState<number[]>([]);
   const toggleTeam = (teamId: number) =>
     setSelectedTeams(xor([teamId], selectedTeams));
+  const [selectedDivisions, setSelectedDivisions] = useState<number[]>([]);
+  const toggleDivision = (divisionId: number) =>
+    setSelectedDivisions(xor([divisionId], selectedDivisions));
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const toggleLocation = (locationName: string) =>
     setSelectedLocations(xor([locationName], selectedLocations));
@@ -73,8 +56,14 @@ export default function Trace() {
   const [endDate, setEndDate] = useState<Date>(endOfWeek(Date.now()));
   const userState = useAsync<TeamSnapUser | null>(loadMe);
   const user = userState.data;
+  const divisionsState = useAsync<TeamSnapDivision[] | null>(loadDivisions);
+  const divisions = divisionsState.data || [];
   const teamsState = useAsync<TeamSnapTeam[]>({
-    promise: user && loadActiveTeams(user),
+    promise:
+      user &&
+      (selectedDivisions.length
+        ? loadTeamsForDivisions(selectedDivisions)
+        : loadActiveTeams(user)),
   });
   const activeTeams = teamsState.data || [];
   const eventsState = useAsync<TeamSnapEvent[]>({
@@ -182,7 +171,7 @@ export default function Trace() {
                           checked={onlyAttendees}
                           onChange={() => setOnlyAttendees(!onlyAttendees)}
                         />{" "}
-                        Only show contacts with availability YES
+                        Only show contacts with availability YES or Health Check Pass
                       </label>
                     </td>
                   </tr>
@@ -191,7 +180,7 @@ export default function Trace() {
             </div>
             {isBefore(endDate, startDate) ? (
               <strong>Please choose an end date after the start date</strong>
-            ) : teamsState.isPending ? (
+            ) : teamsState.isPending || divisionsState.isPending ? (
               <>Loading teams...</>
             ) : teamsState.error ? (
               <>
@@ -199,6 +188,25 @@ export default function Trace() {
               </>
             ) : (
               <div>
+                {!!divisions.length && (
+                  <>
+                    <h3>Divisions ({divisions.length})</h3>
+                    <ul className={styles.checkboxes}>
+                      {divisions.map((division) => (
+                        <li key={division.id}>
+                          <label>
+                            <input
+                              checked={selectedDivisions.includes(division.id)}
+                              type="checkbox"
+                              onChange={() => toggleDivision(division.id)}
+                            />
+                            <strong>{formatDivisionLabel(division)}</strong>
+                          </label>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
                 {activeTeams.length ? (
                   <>
                     <h3>Teams ({activeTeams.length})</h3>
@@ -216,11 +224,6 @@ export default function Trace() {
                         </li>
                       ))}
                     </ul>
-                    <AllOrNone
-                      options={activeTeams.map(({ id }) => id)}
-                      selected={selectedTeams}
-                      setSelected={setSelectedTeams}
-                    />
                   </>
                 ) : (
                   <strong>You have no teams in your TeamSnap account</strong>
@@ -248,11 +251,6 @@ export default function Trace() {
                         </li>
                       ))}
                     </ul>
-                    <AllOrNone
-                      options={locations}
-                      selected={selectedLocations}
-                      setSelected={setSelectedLocations}
-                    />
 
                     {locations.length === 0 ? (
                       <p>Select one or more locations to continue</p>
@@ -315,8 +313,7 @@ export default function Trace() {
             </p>
             <p>
               <strong>Pricing</strong> Free for now. Buy us a drink if this tool
-              saves you time. If we introduce up-front pricing later, existing
-              active users be grandfathered in.
+              makes a difference for you.
             </p>
             <p>
               <label>
