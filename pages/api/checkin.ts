@@ -92,6 +92,8 @@ export default async function checkin(
       eventTime: req.body.eventTime,
       eventTimestamp: req.body.eventTimestamp,
       pass: !req.body.passed ? "Fail" : "Pass",
+      Pass: !req.body.passed ? "Fail" : "Pass",
+      Fail: !req.body.passed ? "Fail" : "Pass",
       userId: req.body.userId,
     };
     for (const [k, v] of Array.from(qs.entries())) {
