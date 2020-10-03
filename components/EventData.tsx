@@ -72,10 +72,11 @@ export default function EventData({
   const hcqState = useAsync({
     promise: loadHealthCheckQuestionnaires(event),
   });
-  const { isPending: checkinsPending, data: checkins = [] } = useAsync({
+  const checkinsState = useAsync({
     promise: fetchFormCheckins(event.id, org),
     initialValue: [],
   });
+  const { isPending: checkinsPending, data: checkins = [] } = checkinsState;
 
   console.log({ checkins });
   const hcqs = hcqState.data || [];
@@ -134,6 +135,16 @@ export default function EventData({
       })
     : members;
   const contactMap = groupByMemberId(contacts);
+  const refresh = () => {
+    loadMembers.cache.delete(String(teamId));
+    loadContacts.cache.delete(String(teamId));
+    loadAvailabilities.cache.delete(String(event.id));
+    loadHealthCheckQuestionnaires.cache.delete(String(teamId));
+    fetchFormCheckins.cache.delete([event.id, org].join(", "));
+    availabilitiesState.reload();
+    hcqState.reload();
+    checkinsState.reload();
+  };
   return (
     <div className={styles.container}>
       <table className={styles.attendees} cellPadding={0} cellSpacing={0}>
@@ -223,7 +234,7 @@ export default function EventData({
                   </td>
                   <td>{phoneNumbers.join(", ")}</td>
                   <td>{emails.join(", ")}</td>
-                  <td>{formatAvailability(availability, hcq)} </td>
+                  <td>{formatAvailability(availability, hcq)} (TeamSnap)</td>
                 </tr>
               );
             }
@@ -234,7 +245,7 @@ export default function EventData({
               <td>{ci.contactName}</td>
               <td>{ci.contactPhoneNumbers.join(", ")}</td>
               <td>{ci.contactEmails.join(", ")}</td>
-              <td>{ci.passed ? <b>&#9745;</b> : <b>&#9888;</b>}</td>
+              <td>{ci.passed ? <b>&#9745;</b> : <b>&#9888;</b>} (Web Form)</td>
             </tr>
           ))}
           <tr>
@@ -258,6 +269,9 @@ export default function EventData({
           {filteredMembers.length} of {members.length} members
         </div>
       )}
+      <div>
+        <button onClick={refresh}>Refresh Contact List</button>
+      </div>
     </div>
   );
 }

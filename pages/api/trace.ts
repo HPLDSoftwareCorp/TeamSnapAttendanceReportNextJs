@@ -27,6 +27,7 @@ export default async function trace(
   const orgDoc = orgsCollection.doc(req.body.org);
   const orgData = await orgDoc.get();
   if (!orgData) {
+    console.error("trace request for invalid org", org);
     res.statusCode = 404;
     res.end("No such org: " + org);
     return;
@@ -55,20 +56,28 @@ export default async function trace(
     }
   }
 
-  console.log(eventId, event.startDate);
+  const eventTime = formatDate(event.startDate, "HH:mm");
+  const eventDate = formatDate(event.startDate, "yyyy-MM-dd");
+  console.log({
+    eventId,
+    eventDate,
+    eventTime,
+    eventTimestamp: event.startDate,
+    eventLocation: event.locationName,
+    startDate: event.startDate,
+  });
 
   const checkinsCollection = orgDoc.collection("checkins");
   const matchingCheckins = await checkinsCollection
     .where("eventLocation", "==", event.locationName)
-    .where("eventTime", "==", formatDate(event.startDate, "HH:mm"))
-    .where("eventDate", "==", formatDate(event.startDate, "yyyy-MM-dd"))
+    .where("eventTimestamp", "==", event.startDate)
     .get();
-  const items = matchingCheckins.docs.map((ci) => ({
-    memberName: ci.get("memberName"),
-    contactName: ci.get("contactName"),
-    contactEmails: ci.get("contactEmails"),
-    contactPhoneNumbers: ci.get("contactPhoneNumbers"),
-    passed: ci.get("passed"),
+  const items = matchingCheckins.docs.map((doc) => ({
+    memberName: doc.get("memberName"),
+    contactName: doc.get("contactName"),
+    contactEmails: doc.get("contactEmails"),
+    contactPhoneNumbers: doc.get("contactPhoneNumbers"),
+    passed: doc.get("passed"),
   }));
   res.end(JSON.stringify({ items }));
 }

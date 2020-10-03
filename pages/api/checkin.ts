@@ -23,6 +23,7 @@ const checkinSchema: JSONSchema7 = {
     eventLocation: { type: "string" },
     eventDate: { type: "string" },
     eventTime: { type: "string" },
+    eventTimestamp: { type: "string", format: "date-time" },
     org: { type: "string" },
     passed: { type: "boolean" },
     teamSnapEventId: { type: "number" },
@@ -36,6 +37,7 @@ const checkinSchema: JSONSchema7 = {
     "eventLocation",
     "eventDate",
     "eventTime",
+    "eventTimestamp",
     "org",
     "passed",
     "timestamp",
@@ -72,6 +74,7 @@ export default async function checkin(
   const checkinsCollection = orgDoc.collection("checkins");
   await checkinsCollection.add({
     ...req.body,
+    eventTimestamp: new Date(req.body.eventTimestamp),
     timestamp: new Date(timestamp),
   });
   const formUrl = orgData.get("googleFormUrl");
@@ -87,6 +90,7 @@ export default async function checkin(
       eventLocation: req.body.eventLocation,
       eventDate: req.body.eventDate,
       eventTime: req.body.eventTime,
+      eventTimestamp: req.body.eventTimestamp,
       pass: !req.body.passed ? "Fail" : "Pass",
       userId: req.body.userId,
     };

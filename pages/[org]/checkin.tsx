@@ -22,6 +22,7 @@ import TopBar from "components/TopBar";
 import ErrorBox from "components/ErrorBox";
 import loadEventsForTeams from "../../lib/client/teamsnap/loadEventsForTeams";
 import formatDate from "date-fns/format";
+import parseDate from "date-fns/parse";
 import loadMemberPhoneNumbers from "../../lib/client/teamsnap/loadMemberPhoneNumbers";
 import loadTeamContactsForUser from "../../lib/client/teamsnap/loadTeamContactsForUser";
 import { useRouter } from "next/router";
@@ -135,24 +136,36 @@ export default function Checkin() {
   }
 
   const addCheckin = () => {
-    const results = {
-      memberName,
-      contactName,
-      contactPhoneNumbers: contactPhoneNumber.split(/\s*,\s*/).filter(Boolean),
-      contactEmails: contactEmail.split(/\s*,\s*/).filter(Boolean),
-      eventLocation,
-      eventDate,
-      eventTime,
-      org,
-      passed: !healthAnswers.some((a) => a !== false),
-      teamSnapEventId: teamSnapEvent?.id,
-      teamSnapTeamId: teamSnapEvent?.teamId,
-      timestamp: new Date().toISOString(),
-    };
+    const eventTimestamp = parseDate(
+      [eventDate, eventTime].join(" "),
+      "yyyy-MM-dd HH:mm",
+      new Date()
+    );
+    console.log(
+      { eventDate, eventTime, eventTimestamp },
+      [eventDate, eventTime].join(" "),
+      "yyyy-MM-dd HH:mm"
+    );
     return fetch("/api/checkin", {
       method: "post",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify(results),
+      body: JSON.stringify({
+        memberName,
+        contactName,
+        contactPhoneNumbers: contactPhoneNumber
+          .split(/\s*,\s*/)
+          .filter(Boolean),
+        contactEmails: contactEmail.split(/\s*,\s*/).filter(Boolean),
+        eventLocation,
+        eventDate,
+        eventTime,
+        eventTimestamp: eventTimestamp.toISOString(),
+        org,
+        passed: !healthAnswers.some((a) => a !== false),
+        teamSnapEventId: teamSnapEvent?.id,
+        teamSnapTeamId: teamSnapEvent?.teamId,
+        timestamp: new Date().toISOString(),
+      }),
     });
   };
 
