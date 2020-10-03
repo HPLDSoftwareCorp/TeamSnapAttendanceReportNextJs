@@ -62,9 +62,10 @@ export default function Trace() {
     sessionStorage["agreedToTerms"] = true;
     setAgreed(true);
   };
-  const toggleTeam = (teamId) => setSelectedTeams(xor([teamId], selectedTeams));
+  const toggleTeam = (teamId: number) =>
+    setSelectedTeams(xor([teamId], selectedTeams));
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
-  const toggleLocation = (locationName) =>
+  const toggleLocation = (locationName: string) =>
     setSelectedLocations(xor([locationName], selectedLocations));
   const [startDate, setStartDate] = useState<Date>(
     startOfWeek(subWeeks(Date.now(), 1))

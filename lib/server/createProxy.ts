@@ -1,6 +1,6 @@
 import { createProxyMiddleware } from "http-proxy-middleware";
 
-const createProxy = (domain) =>
+const createProxy = (domain: string) =>
   createProxyMiddleware({
     changeOrigin: true,
     logLevel: "debug",

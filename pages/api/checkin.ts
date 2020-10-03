@@ -82,7 +82,7 @@ export default async function checkin(
     const parsed = new URL(formUrl);
     parsed.pathname = parsed.pathname.replace("/viewform", "/formResponse");
     const qs = parsed.searchParams;
-    const subs = {
+    const subs: { [k: string]: string | undefined } = {
       memberName: req.body.memberName,
       contactName: req.body.contactName,
       contactPhoneNumber: req.body.contactPhoneNumbers.join(", "),

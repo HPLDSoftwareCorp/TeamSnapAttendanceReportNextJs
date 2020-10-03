@@ -72,12 +72,6 @@ export default async function trace(
     .where("eventLocation", "==", event.locationName)
     .where("eventTimestamp", "==", event.startDate)
     .get();
-  const items = matchingCheckins.docs.map((doc) => ({
-    memberName: doc.get("memberName"),
-    contactName: doc.get("contactName"),
-    contactEmails: doc.get("contactEmails"),
-    contactPhoneNumbers: doc.get("contactPhoneNumbers"),
-    passed: doc.get("passed"),
-  }));
+  const items = matchingCheckins.docs.map((doc: any) => doc.data());
   res.end(JSON.stringify({ items }));
 }

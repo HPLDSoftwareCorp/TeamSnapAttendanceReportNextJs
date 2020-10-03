@@ -1,9 +1,6 @@
 import { TeamSnap } from "./TeamSnap";
 
 declare global {
-  interface Window {
-    teamsnap?: TeamSnap;
-  }
   interface XmlHttpRequest {
     data?: object;
   }

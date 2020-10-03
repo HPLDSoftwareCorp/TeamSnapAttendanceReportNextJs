@@ -1,7 +1,6 @@
 import React, { ChangeEventHandler, useState } from "react";
 import {
   TeamSnapAvailability,
-  TeamSnapContact,
   TeamSnapEvent,
   TeamSnapHealthCheckQuestionnaire,
   TeamSnapTeam,
@@ -91,7 +90,7 @@ export default function EventData({
   };
 
   const pending: string[] = Object.keys(asyncStates).filter(
-    (k) => asyncStates[k].isPending
+    (k: keyof typeof asyncStates) => asyncStates[k].isPending
   );
   const error =
     membersState.error ||
@@ -242,7 +241,7 @@ export default function EventData({
               );
             }
           )}
-          {checkins.map((ci, n) => (
+          {checkins.map((ci: any, n: number) => (
             <tr key={n}>
               <td>{ci.memberName}</td>
               <td>{ci.contactName}</td>

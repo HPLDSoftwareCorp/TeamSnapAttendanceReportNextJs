@@ -378,7 +378,7 @@ interface LoadContactsParams {
 }
 
 export interface TeamSnap {
-  browserLogout();
+  browserLogout(): void;
 
   apiUrl: string;
 
@@ -388,13 +388,13 @@ export interface TeamSnap {
 
   hasSession(): boolean;
 
-  init(clientId): void;
+  init(clientId: string): void;
 
   isAuthed(): boolean;
 
   loadCollections(): void;
 
-  startBrowserAuth(redirect: string, scopes: string[]);
+  startBrowserAuth(redirect: string, scopes: string[]): void;
 
   request?: {
     hook(f: (xhr: XMLHttpRequest, data: unknown) => void): void;
@@ -403,25 +403,42 @@ export interface TeamSnap {
   loadMe(): Promise<TeamSnapUser>;
 
   loadActiveTeams(params: LoadTeamsParams): Promise<TeamSnapTeam[]>;
+
   loadAvailabilities(
     params: LoadAvailabilitiesParams
   ): Promise<TeamSnapAvailability[]>;
+
   loadContacts(params: LoadContactsParams): Promise<TeamSnapContact[]>;
+
   loadEvents(params: LoadEventsParams): Promise<TeamSnapEvent[]>;
+
   loadHealthCheckQuestionnaires(
     params: LoadHealthCheckQuestionnairesParams
   ): Promise<TeamSnapHealthCheckQuestionnaire[]>;
+
   loadTeams(params: LoadTeamsParams): Promise<TeamSnapTeam[]>;
+
   loadMembers(params: LoadMembersParams): Promise<TeamSnapMember[]>;
+
   loadContactEmailAddresses(
     params: LoadContactEmailAddressesParams
   ): TeamSnapContactEmailAddress[];
+
   loadContactPhoneNumbers(
     params: LoadContactPhoneNumbersParams
   ): TeamSnapContactPhoneNumber[];
+
   loadMemberPhoneNumbers(params: {
     memberId: number;
   }): Promise<TeamSnapMemberPhoneNumber[]>;
 
   loadMemberEmailAddresses(param: LoadMemberEmailAddressesParams): [];
 }
+
+declare global {
+  interface Window {
+    teamsnap?: TeamSnap;
+  }
+}
+
+
