@@ -13,7 +13,7 @@ export default function ErrorBox({ error }: ErrorBoxProps) {
       <pre>{String(error.stack || "")}</pre>
       <p>
         Try reloading the page. If that doesn't fix it,{" "}
-        <a href="mailto:Dobes Vandermeer <dobesv+teamsnapattendance@gmail.com>">
+        <a href="mailto:Dobes Vandermeer <info@hpld.co>">
           Email Us
         </a>
       </p>

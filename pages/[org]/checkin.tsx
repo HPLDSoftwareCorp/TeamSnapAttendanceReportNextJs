@@ -500,7 +500,7 @@ export default function Checkin() {
 
       <footer className={styles.footer}>
         Copyright &copy; 2020 HPLD Software Corp., All Rights Reserved.{" - "}
-        <a href="mailto:Dobes Vandermeer <dobesv+teamsnapattendance@gmail.com>">
+        <a href="mailto:Dobes Vandermeer <info@hpld.co>">
           Email Us
         </a>
       </footer>

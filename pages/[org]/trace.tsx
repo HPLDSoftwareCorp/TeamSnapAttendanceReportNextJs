@@ -121,7 +121,7 @@ export default function Trace() {
             <pre>{String(userState.error.stack || "")}</pre>
             <p>
               Try reloading the page. If that doesn't fix it,{" "}
-              <a href="mailto:Dobes Vandermeer <dobesv+teamsnapattendance@gmail.com>">
+              <a href="mailto:Dobes Vandermeer <info@hpld.co>">
                 Email Us
               </a>
             </p>
@@ -325,8 +325,11 @@ export default function Trace() {
               address of users who log in.
             </p>
             <p>
-              <strong>Pricing</strong> Free for now. Buy us a drink if this tool
-              makes a difference for you.
+              <strong>Pricing</strong>{" "}
+              <a href="mailto:Dobes Vandermeer <info@hpld.co>">
+                Email Us
+              </a>{" "}
+              to discuss about pricing.
             </p>
             <p>
               <label>
@@ -351,7 +354,7 @@ export default function Trace() {
 
       <footer className={styles.footer}>
         Copyright &copy; 2020 HPLD Software Corp., All Rights Reserved.{" - "}
-        <a href="mailto:Dobes Vandermeer <dobesv+teamsnapattendance@gmail.com>">
+        <a href="mailto:Dobes Vandermeer <info@hpld.co>">
           Email Us
         </a>
       </footer>
