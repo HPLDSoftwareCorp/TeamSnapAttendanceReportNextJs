@@ -25,6 +25,8 @@ import loadContactPhoneNumbers from "../../lib/client/teamsnap/loadContactPhoneN
 import loadContactEmailAddresses from "../../lib/client/teamsnap/loadContactEmailAddresses";
 import loadMemberEmailAddresses from "../../lib/client/teamsnap/loadMemberEmailAddresses";
 
+import 'time-input-polyfill';
+
 const healthQuestionList = [
   <>
     <h3>
@@ -436,7 +438,7 @@ export default function Checkin() {
               value={eventTime}
               onChange={(e) => setEventTime(e.target.value)}
             />
-            <p>e.g. {formatDate(new Date(), "HH:mm b")}</p>
+            <p>e.g. {formatDate(new Date(), "h:mm a")}</p>
           </label>
           {eventTimestamp > endDate ? (
             <p className={styles.dateWarning}>

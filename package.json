@@ -21,7 +21,8 @@
     "next": "9.5.1",
     "react": "16.13.1",
     "react-async": "^10.0.1",
-    "react-dom": "16.13.1"
+    "react-dom": "16.13.1",
+    "time-input-polyfill": "^1.0.9"
   },
   "devDependencies": {
     "@types/json-schema": "^7.0.6",
