@@ -411,6 +411,11 @@ interface LoadContactPhoneNumbersParams {
   teamId?: number;
 }
 
+interface LoadMemberPhoneNumbersParams {
+  memberId?: number;
+  teamId?: number;
+}
+
 interface LoadMembersParams {
   contactId?: number;
   teamId?: number;
@@ -479,7 +484,7 @@ export interface TeamSnap {
   ): TeamSnapContactPhoneNumber[];
 
   loadMemberPhoneNumbers(
-    params: LoadContactPhoneNumbersParams
+    params: LoadMemberPhoneNumbersParams
   ): Promise<TeamSnapMemberPhoneNumber[]>;
 
   loadMemberEmailAddresses(param: LoadMemberEmailAddressesParams): [];

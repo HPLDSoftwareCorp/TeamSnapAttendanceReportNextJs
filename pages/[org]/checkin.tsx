@@ -25,7 +25,9 @@ import loadContactPhoneNumbers from "../../lib/client/teamsnap/loadContactPhoneN
 import loadContactEmailAddresses from "../../lib/client/teamsnap/loadContactEmailAddresses";
 import loadMemberEmailAddresses from "../../lib/client/teamsnap/loadMemberEmailAddresses";
 
-import 'time-input-polyfill';
+if (process.browser) {
+  import("time-input-polyfill");
+}
 
 const healthQuestionList = [
   <>
