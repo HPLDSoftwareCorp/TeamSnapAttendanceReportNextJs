@@ -478,9 +478,9 @@ export interface TeamSnap {
     params: LoadContactPhoneNumbersParams
   ): TeamSnapContactPhoneNumber[];
 
-  loadMemberPhoneNumbers(params: {
-    memberId: number;
-  }): Promise<TeamSnapMemberPhoneNumber[]>;
+  loadMemberPhoneNumbers(
+    params: LoadContactPhoneNumbersParams
+  ): Promise<TeamSnapMemberPhoneNumber[]>;
 
   loadMemberEmailAddresses(param: LoadMemberEmailAddressesParams): [];
 }

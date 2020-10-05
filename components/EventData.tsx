@@ -16,6 +16,8 @@ import loadContactPhoneNumbersForTeam from "lib/client/teamsnap/loadContactPhone
 import formatDate from "date-fns/format";
 import loadMembers from "lib/client/teamsnap/loadMembers";
 import fetchFormCheckins from "lib/client/fetchFormCheckins";
+import loadMemberPhoneNumbersForTeam from "../lib/client/teamsnap/loadMemberPhoneNumbersForTeam";
+import loadMemberEmailAddressesForTeam from "../lib/client/teamsnap/loadMemberEmailAddressesForTeam";
 
 export interface EventDataProps {
   event: TeamSnapEvent;
@@ -62,11 +64,17 @@ export default function EventData({
     promise: loadAvailabilities(event.id),
   });
   const availabilities = availabilitiesState.data || [];
-  const phoneNumbersState = useAsync({
+  const contactPhoneNumbersState = useAsync({
     promise: loadContactPhoneNumbersForTeam(teamId),
   });
-  const emailAddressesState = useAsync({
+  const contactEmailAddressesState = useAsync({
     promise: loadContactEmailAddressesForTeam(teamId),
+  });
+  const memberPhoneNumbersState = useAsync({
+    promise: loadMemberPhoneNumbersForTeam(teamId),
+  });
+  const memberEmailAddressesState = useAsync({
+    promise: loadMemberEmailAddressesForTeam(teamId),
   });
   const hcqState = useAsync({
     promise: loadHealthCheckQuestionnaires(event),
@@ -85,22 +93,18 @@ export default function EventData({
     members: membersState,
     contacts: contactsState,
     availabilities: availabilitiesState,
+    "contact email addresses": contactEmailAddressesState,
+    "contact phone numbers": contactPhoneNumbersState,
     "health check questionnaires": hcqState,
-    "phone numbers": phoneNumbersState,
-    "email addresses": emailAddressesState,
+    "member email addresses": memberEmailAddressesState,
+    "member phone numbers": memberPhoneNumbersState,
     "web form submissions": checkinsState,
   };
 
   const pending: string[] = Object.keys(asyncStates).filter(
     (k: keyof typeof asyncStates) => asyncStates[k].isPending
   );
-  const error =
-    membersState.error ||
-    contactsState.error ||
-    availabilitiesState.error ||
-    hcqState.error ||
-    phoneNumbersState.error ||
-    emailAddressesState.error;
+  const error = Object.values(asyncStates).find((e) => e.error)?.error;
   if (error) {
     return (
       <div>
@@ -121,8 +125,16 @@ export default function EventData({
     }
     return result;
   };
-  const emailsMap = groupByMemberId(emailAddressesState.data || []);
-  const phoneNumbersMap = groupByMemberId(phoneNumbersState.data || []);
+  const contactEmailsMap = groupByMemberId(
+    contactEmailAddressesState.data || []
+  );
+  const contactPhoneNumbersMap = groupByMemberId(
+    contactPhoneNumbersState.data || []
+  );
+  const memberEmailsMap = groupByMemberId(memberEmailAddressesState.data || []);
+  const memberPhoneNumbersMap = groupByMemberId(
+    memberPhoneNumbersState.data || []
+  );
   const hcqMap = new Map(
     hcqs.filter((q) => q.eventId === event.id).map((q) => [q.memberId, q])
   );
@@ -196,7 +208,10 @@ export default function EventData({
                 new Set(
                   [
                     ...(member.phoneNumbers || []),
-                    ...(phoneNumbersMap
+                    ...(memberPhoneNumbersMap
+                      .get(member.id)
+                      ?.map((ph) => ph.phoneNumber) || []),
+                    ...(contactPhoneNumbersMap
                       .get(member.id)
                       ?.map((ph) => ph.phoneNumber) || []),
                   ].filter(Boolean)
@@ -206,7 +221,11 @@ export default function EventData({
                 new Set(
                   [
                     ...(member.emailAddresses || []),
-                    ...(emailsMap.get(member.id)?.map((em) => em.email) || []),
+                    ...(memberEmailsMap.get(member.id)?.map((em) => em.email) ||
+                      []),
+                    ...(contactEmailsMap
+                      .get(member.id)
+                      ?.map((em) => em.email) || []),
                   ].filter(Boolean)
                 )
               ).sort();
