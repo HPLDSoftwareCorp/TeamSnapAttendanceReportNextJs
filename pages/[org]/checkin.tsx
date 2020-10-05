@@ -40,9 +40,9 @@ const healthQuestionList = [
       rashes or discoloration of fingers or toes.
     </p>
     <p>
-      Fever: Average normal body temperature taken orally is about 37°C. For
-      more on normal body temperature and fevers, see HealthLinkBC's information
-      for children age 11 and younger and for people age 12 and older .
+      Fever: A normal body temperature is usually under 37.5°C. Please consult
+      with your health provider if you are experiencing a fever with a body
+      temperature higher than 38°C.
     </p>
   </>,
   <>
@@ -500,9 +500,7 @@ export default function Checkin() {
 
       <footer className={styles.footer}>
         Copyright &copy; 2020 HPLD Software Corp., All Rights Reserved.{" - "}
-        <a href="mailto:Dobes Vandermeer <info@hpld.co>">
-          Email Us
-        </a>
+        <a href="mailto:Dobes Vandermeer <info@hpld.co>">Email Us</a>
       </footer>
     </div>
   );
