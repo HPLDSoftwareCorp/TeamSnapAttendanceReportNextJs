@@ -14,19 +14,18 @@ import doLogout from "lib/client/teamsnap/doLogout";
 import doLogin from "lib/client/teamsnap/doLogin";
 import TopBar from "components/TopBar";
 import ErrorBox from "components/ErrorBox";
-import loadEventsForTeams from "../../lib/client/teamsnap/loadEventsForTeams";
+import loadEventsForTeams from "lib/client/teamsnap/loadEventsForTeams";
 import formatDate from "date-fns/format";
 import parseDate from "date-fns/parse";
-import loadMemberPhoneNumbers from "../../lib/client/teamsnap/loadMemberPhoneNumbers";
-import loadTeamContactsForUser from "../../lib/client/teamsnap/loadTeamContactsForUser";
+import loadMemberPhoneNumbers from "lib/client/teamsnap/loadMemberPhoneNumbers";
+import loadTeamContactsForUser from "lib/client/teamsnap/loadTeamContactsForUser";
 import { useRouter } from "next/router";
-import YesNo from "../../components/YesNo";
-import loadContactPhoneNumbers from "../../lib/client/teamsnap/loadContactPhoneNumbers";
-import loadContactEmailAddresses from "../../lib/client/teamsnap/loadContactEmailAddresses";
-import loadMemberEmailAddresses from "../../lib/client/teamsnap/loadMemberEmailAddresses";
+import YesNo from "components/YesNo";
+import loadContactPhoneNumbers from "lib/client/teamsnap/loadContactPhoneNumbers";
+import loadContactEmailAddresses from "lib/client/teamsnap/loadContactEmailAddresses";
+import loadMemberEmailAddresses from "lib/client/teamsnap/loadMemberEmailAddresses";
 import { GetServerSideProps } from "next";
-import redirectToLogin from "../../lib/server/teamsnap/redirectToLogin";
-import loadOrgLocationNames from "../../lib/server/firebase/loadOrgLocationNames";
+import loadOrgLocationNames from "lib/server/firebase/loadOrgLocationNames";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
@@ -420,17 +419,18 @@ export default function Checkin({ orgLocations }: CheckinProps) {
 
           <label className={styles.field}>
             Location
-            {orgLocations.map((orgLocation) => (
-              <label key={orgLocation}>
-                <input
-                  checked={orgLocation === eventLocation}
-                  type="checkbox"
-                  value={orgLocation}
-                  onClick={() => setEventLocation(orgLocation)}
-                />{" "}
-                {orgLocation}
-              </label>
-            ))}
+            {!(teamSnapEvent || locationParam) &&
+              orgLocations.map((orgLocation) => (
+                <label key={orgLocation}>
+                  <input
+                    checked={orgLocation === eventLocation}
+                    type="checkbox"
+                    value={orgLocation}
+                    onClick={() => setEventLocation(orgLocation)}
+                  />{" "}
+                  {orgLocation}
+                </label>
+              ))}
             <input
               disabled={!!(teamSnapEvent || locationParam)}
               value={eventLocation}
