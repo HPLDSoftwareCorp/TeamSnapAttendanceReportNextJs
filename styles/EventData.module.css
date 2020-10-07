@@ -49,6 +49,14 @@ table.attendees td.notes pre {
   display: none;
 }
 
+@media only screen and (max-width: 600px) {
+
+  table.attendees {
+    font-size: 8px;
+    word-break: break-word;
+  }
+}
+
 @media print {
   table.attendees td.notes label {
     display: none;
@@ -59,3 +67,4 @@ table.attendees td.notes pre {
     padding: 1em;
   }
 }
+
