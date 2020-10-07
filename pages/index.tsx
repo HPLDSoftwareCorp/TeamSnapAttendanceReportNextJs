@@ -16,7 +16,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 export default function Home() {
-  const router = useRouter();
   return (
     <div>
       If you are trying to use this site, you should have been provided with a
