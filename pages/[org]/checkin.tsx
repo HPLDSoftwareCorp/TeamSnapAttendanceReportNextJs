@@ -24,6 +24,17 @@ import YesNo from "../../components/YesNo";
 import loadContactPhoneNumbers from "../../lib/client/teamsnap/loadContactPhoneNumbers";
 import loadContactEmailAddresses from "../../lib/client/teamsnap/loadContactEmailAddresses";
 import loadMemberEmailAddresses from "../../lib/client/teamsnap/loadMemberEmailAddresses";
+import { GetServerSideProps } from "next";
+import redirectToLogin from "../../lib/server/teamsnap/redirectToLogin";
+import loadOrgLocationNames from "../../lib/server/firebase/loadOrgLocationNames";
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  return {
+    props: {
+      orgLocations: await loadOrgLocationNames(context.params.org as string),
+    },
+  };
+};
 
 const healthQuestionList = [
   <>
@@ -60,7 +71,10 @@ const healthQuestionList = [
   </>,
 ];
 
-export default function Checkin() {
+interface CheckinProps {
+  orgLocations: string[];
+}
+export default function Checkin({ orgLocations }: CheckinProps) {
   const router = useRouter();
   const org = String(router.query.org);
   const lookAheadHours = Number(router.query.hours || 8);
@@ -75,7 +89,9 @@ export default function Checkin() {
   const [teamSnapEvent, setTeamSnapEvent] = useState<TeamSnapEvent | null>(
     null
   );
-  const locationParam = String(router.query.location || "");
+  const locationParam = String(
+    router.query.location || (orgLocations.length === 1 ? orgLocations[0] : "")
+  );
   const [eventLocationState, setEventLocation] = useState<string>(
     locationParam
   );
@@ -404,6 +420,17 @@ export default function Checkin() {
 
           <label className={styles.field}>
             Location
+            {orgLocations.map((orgLocation) => (
+              <label key={orgLocation}>
+                <input
+                  checked={orgLocation === eventLocation}
+                  type="checkbox"
+                  value={orgLocation}
+                  onClick={() => setEventLocation(orgLocation)}
+                />{" "}
+                {orgLocation}
+              </label>
+            ))}
             <input
               disabled={!!(teamSnapEvent || locationParam)}
               value={eventLocation}

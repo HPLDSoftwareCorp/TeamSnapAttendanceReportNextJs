@@ -26,12 +26,13 @@ import format from "date-fns/format";
 import parse from "date-fns/parse";
 import TopBar from "components/TopBar";
 import { useRouter } from "next/router";
-import loadDivisions from "../../lib/client/teamsnap/loadDivisions";
-import formatDivisionLabel from "../../lib/client/teamsnap/formatDivisionLabel";
-import loadTeamsForDivisions from "../../lib/client/teamsnap/loadTeamsForDivisions";
+import loadDivisions from "lib/client/teamsnap/loadDivisions";
+import formatDivisionLabel from "lib/client/teamsnap/formatDivisionLabel";
+import loadTeamsForDivisions from "lib/client/teamsnap/loadTeamsForDivisions";
 import { GetServerSideProps } from "next";
-import exchangeCodeForToken from "../../lib/server/teamsnap/exchangeCodeForToken";
-import redirectToLogin from "../../lib/server/teamsnap/redirectToLogin";
+import redirectToLogin from "lib/server/teamsnap/redirectToLogin";
+import initFirebaseAdmin from "lib/server/firebase/initFirebaseAdmin";
+import loadOrgLocationNames from "../../lib/server/firebase/loadOrgLocationNames";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   if (context.query.login) {
@@ -41,10 +42,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     returnUrl.searchParams.delete("login");
     redirectToLogin(context.req, context.res, returnUrl.toString());
   }
-  return { props: {} };
+
+  return {
+    props: {
+      orgLocations: await loadOrgLocationNames(context.params.org as string),
+    },
+  };
 };
 
-export default function Trace() {
+interface TraceProps {
+  orgLocations: string[];
+}
+export default function Trace({ orgLocations = [] }: TraceProps) {
   const router = useRouter();
   const org = String(router.query.org);
   const [agreed, setAgreed] = useState<boolean>(
@@ -94,7 +103,8 @@ export default function Trace() {
       )
   );
   const locations = Array.from(
-    (events && new Set(events.map((e) => e.locationName))) || []
+    (events?.length && new Set(events.map((e) => e.locationName))) ||
+      orgLocations
   );
   const matchedEvents = events.filter((event) =>
     selectedLocations.includes(event.locationName)
