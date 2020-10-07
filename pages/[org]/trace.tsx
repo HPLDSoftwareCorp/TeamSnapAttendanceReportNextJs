@@ -29,6 +29,20 @@ import { useRouter } from "next/router";
 import loadDivisions from "../../lib/client/teamsnap/loadDivisions";
 import formatDivisionLabel from "../../lib/client/teamsnap/formatDivisionLabel";
 import loadTeamsForDivisions from "../../lib/client/teamsnap/loadTeamsForDivisions";
+import { GetServerSideProps } from "next";
+import exchangeCodeForToken from "../../lib/server/teamsnap/exchangeCodeForToken";
+import redirectToLogin from "../../lib/server/teamsnap/redirectToLogin";
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  if (context.query.login) {
+    const returnUrl = new URL(
+      `https://${context.req.headers.host}${context.req.url}`
+    );
+    returnUrl.searchParams.delete("login");
+    redirectToLogin(context.req, context.res, returnUrl.toString());
+  }
+  return { props: {} };
+};
 
 export default function Trace() {
   const router = useRouter();
@@ -121,9 +135,7 @@ export default function Trace() {
             <pre>{String(userState.error.stack || "")}</pre>
             <p>
               Try reloading the page. If that doesn't fix it,{" "}
-              <a href="mailto:Dobes Vandermeer <info@hpld.co>">
-                Email Us
-              </a>
+              <a href="mailto:Dobes Vandermeer <info@hpld.co>">Email Us</a>
             </p>
           </>
         ) : user ? (
@@ -326,10 +338,8 @@ export default function Trace() {
             </p>
             <p>
               <strong>Pricing</strong>{" "}
-              <a href="mailto:Dobes Vandermeer <info@hpld.co>">
-                Email Us
-              </a>{" "}
-              to discuss about pricing.
+              <a href="mailto:Dobes Vandermeer <info@hpld.co>">Email Us</a> to
+              discuss about pricing.
             </p>
             <p>
               <label>
@@ -354,9 +364,7 @@ export default function Trace() {
 
       <footer className={styles.footer}>
         Copyright &copy; 2020 HPLD Software Corp., All Rights Reserved.{" - "}
-        <a href="mailto:Dobes Vandermeer <info@hpld.co>">
-          Email Us
-        </a>
+        <a href="mailto:Dobes Vandermeer <info@hpld.co>">Email Us</a>
       </footer>
     </div>
   );
