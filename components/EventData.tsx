@@ -151,7 +151,6 @@ export default function EventData({
     : members;
   const contactMap = groupByMemberId(contacts);
   const refresh = () => {
-    console.log("Reloading...");
     loadMembers.cache.delete(String(teamId));
     loadContacts.cache.delete(String(teamId));
     loadAvailabilities.cache.delete(String(event.id));

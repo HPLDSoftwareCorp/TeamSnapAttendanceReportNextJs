@@ -51,7 +51,6 @@ export default async function trace(
       ${user.email} in ${org} for event ${eventId} in team ${event.teamId}
       with location ${event.locationName} and start time ${event.startDate}
       `;
-      console.log(warning);
       res.end(JSON.stringify({ items: [], warning }));
       return;
     }

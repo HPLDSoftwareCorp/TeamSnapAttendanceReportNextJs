@@ -3,7 +3,6 @@ import { GetServerSideProps } from "next";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { res, req } = context;
-  console.log(req.headers.host);
   const m = /^(checkin|trace).([a-z0-9-]+).[a-z]+/i.exec(req.headers.host);
   if (m) {
     const org = m[2];

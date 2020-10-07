@@ -125,11 +125,6 @@ export default function Checkin() {
   );
 
   const addCheckin = () => {
-    console.log(
-      { eventDate, eventTime, eventTimestamp },
-      [eventDate, eventTime].join(" "),
-      "yyyy-MM-dd HH:mm"
-    );
     return fetch("/api/checkin", {
       method: "post",
       headers: { "content-type": "application/json" },
