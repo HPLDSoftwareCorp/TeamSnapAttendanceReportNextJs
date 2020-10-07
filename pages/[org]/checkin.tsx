@@ -426,7 +426,7 @@ export default function Checkin({ orgLocations }: CheckinProps) {
                     checked={orgLocation === eventLocation}
                     type="checkbox"
                     value={orgLocation}
-                    onClick={() => setEventLocation(orgLocation)}
+                    onChange={() => setEventLocation(orgLocation)}
                   />{" "}
                   {orgLocation}
                 </label>
