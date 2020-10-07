@@ -7,7 +7,7 @@ import {
 } from "lib/client/teamsnap/TeamSnap";
 import loadMe from "lib/client/teamsnap/loadMe";
 import loadActiveTeams from "lib/client/teamsnap/loadActiveTeams";
-import { addHours, isSameDay, subHours } from "date-fns";
+import { addHours, isSameDay, roundToNearestMinutes, subHours } from "date-fns";
 import styles from "styles/checkin.module.css";
 import Head from "next/head";
 import doLogout from "lib/client/teamsnap/doLogout";
@@ -78,8 +78,12 @@ export default function Checkin({ orgLocations }: CheckinProps) {
   const org = String(router.query.org);
   const lookAheadHours = Number(router.query.hours || 8);
   const lookBackHours = Number(router.query.hours || 1);
-  const startDate = subHours(Date.now(), lookBackHours);
-  const endDate = addHours(Date.now(), lookAheadHours);
+  const startDate = roundToNearestMinutes(subHours(Date.now(), lookBackHours), {
+    nearestTo: 15,
+  });
+  const endDate = roundToNearestMinutes(addHours(Date.now(), lookAheadHours), {
+    nearestTo: 15,
+  });
   const userState = useAsync<TeamSnapUser | null>(loadMe);
   const user = userState.data;
   const teamsState = useAsync<TeamSnapTeam[]>({
