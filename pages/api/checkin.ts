@@ -1,4 +1,4 @@
-import initFirebaseAdmin from "lib/server/initFirebaseAdmin";
+import initFirebaseAdmin from "lib/server/firebase/initFirebaseAdmin";
 import { IncomingMessage, ServerResponse } from "http";
 import { JSONSchema7 } from "json-schema";
 import Ajv from "ajv";

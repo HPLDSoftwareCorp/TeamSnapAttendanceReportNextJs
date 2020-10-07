@@ -2,7 +2,7 @@ import { IncomingMessage, ServerResponse } from "http";
 import createTeamSnapClient from "../../lib/server/teamsnap/createTeamSnapClient";
 import loadMe from "../../lib/server/teamsnap/loadMe";
 import loadEvent from "../../lib/server/teamsnap/loadEvent";
-import initFirebaseAdmin from "../../lib/server/initFirebaseAdmin";
+import initFirebaseAdmin from "../../lib/server/firebase/initFirebaseAdmin";
 import formatDate from "date-fns/format";
 
 export default async function trace(
