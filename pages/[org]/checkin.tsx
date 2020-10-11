@@ -32,6 +32,7 @@ import {
   FieldWrapper,
 } from "@teamsnap/teamsnap-ui";
 import firebaseLogin from "../../lib/client/firebaseLogin";
+import logEvent from "../../lib/client/logEvent";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
@@ -200,8 +201,13 @@ export default function Checkin({ orgLocations }: CheckinProps) {
     ) {
       alert("Please answer all the health questions");
     } else {
-      // TODO: Save submission data for later lookup!
       const timestamp = new Date();
+
+      logEvent("Check In Form Completed", {
+        eventLocation,
+        org,
+        passed: healthQuestionList.every((q, i) => healthAnswers[i] === true),
+      });
 
       await addCheckin().then(
         () => setSubmittedAt(timestamp),
