@@ -55,18 +55,6 @@ export default async function trace(
       return;
     }
   }
-
-  const eventTime = formatDate(event.startDate, "HH:mm");
-  const eventDate = formatDate(event.startDate, "yyyy-MM-dd");
-  console.log({
-    eventId,
-    eventDate,
-    eventTime,
-    eventTimestamp: event.startDate,
-    eventLocation: event.locationName,
-    startDate: event.startDate,
-  });
-
   const checkinsCollection = orgDoc.collection("checkins");
   const matchingCheckins = await checkinsCollection
     .where("eventLocation", "==", event.locationName)
