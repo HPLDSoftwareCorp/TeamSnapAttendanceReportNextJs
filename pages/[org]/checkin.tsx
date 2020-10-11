@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { useAsync } from "react-async";
 import {
   TeamSnapEvent,
@@ -26,6 +26,13 @@ import loadContactEmailAddresses from "lib/client/teamsnap/loadContactEmailAddre
 import loadMemberEmailAddresses from "lib/client/teamsnap/loadMemberEmailAddresses";
 import { GetServerSideProps } from "next";
 import loadOrgLocationNames from "lib/server/firebase/loadOrgLocationNames";
+import {
+  Button,
+  FieldGroup,
+  FieldLabel,
+  FieldMessage,
+  FieldWrapper,
+} from "@teamsnap/teamsnap-ui";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
@@ -65,9 +72,7 @@ const healthQuestionList = [
       ?
     </h3>
   </>,
-  <>
-    <h3>Have you been asked by public health to self-isolate?</h3>
-  </>,
+  <h3>Have you been asked by public health to self-isolate?</h3>,
 ];
 
 interface CheckinProps {
@@ -92,13 +97,12 @@ export default function Checkin({ orgLocations }: CheckinProps) {
   const [teamSnapEvent, setTeamSnapEvent] = useState<TeamSnapEvent | null>(
     null
   );
-  const locationParam = String(
+  const initialEventLocation = String(
     router.query.location || (orgLocations.length === 1 ? orgLocations[0] : "")
   );
-  const [eventLocationState, setEventLocation] = useState<string>(
-    locationParam
+  const [eventLocation, setEventLocation] = useState<string>(
+    initialEventLocation
   );
-  const eventLocation = locationParam || eventLocationState;
   const [eventDate, setEventDate] = useState<string>(
     formatDate(new Date(), "yyyy-MM-dd")
   );
@@ -111,6 +115,9 @@ export default function Checkin({ orgLocations }: CheckinProps) {
     Array<boolean | null | undefined>
   >(new Array(healthQuestionList.length));
   const [submittedAt, setSubmittedAt] = useState<Date | null>(null);
+  const [showBlankFieldErrors, setShowBlankFieldErrors] = useState<boolean>(
+    false
+  );
 
   const setHealthAnswer = (n: number, ans: boolean) => {
     const newAnswers = [...healthAnswers];
@@ -131,9 +138,9 @@ export default function Checkin({ orgLocations }: CheckinProps) {
     new Set(activeTeams.map((t) => t.leagueName))
   ).filter(Boolean);
 
-  const events = locationParam
+  const events = eventLocation
     ? eventsState.data.filter(
-        (e) => e.locationName.toLowerCase() === locationParam.toLowerCase()
+        (e) => e.locationName.toLowerCase() === eventLocation.toLowerCase()
       )
     : eventsState.data;
 
@@ -168,6 +175,7 @@ export default function Checkin({ orgLocations }: CheckinProps) {
   };
 
   const onClickSubmit = async () => {
+    setShowBlankFieldErrors(true);
     if (!eventLocation) {
       alert("Please enter the location of the event");
     } else if (!eventTime) {
@@ -187,6 +195,10 @@ export default function Checkin({ orgLocations }: CheckinProps) {
           lookAheadHours
         ).toLocaleString()}`
       );
+    } else if (
+      healthQuestionList.some((q, i) => typeof healthAnswers[i] !== "boolean")
+    ) {
+      alert("Please answer all the health questions");
     } else {
       // TODO: Save submission data for later lookup!
       const timestamp = new Date();
@@ -293,7 +305,8 @@ export default function Checkin({ orgLocations }: CheckinProps) {
           <h3>Your Upcoming Events</h3>
           <p>
             Sorry, we didn't find any events within {lookAheadHours} hours in
-            your TeamSnap account. Please fill in the form manually.
+            your TeamSnap account at this location. Please select the correct
+            location or check back within 8 hours of your event.
           </p>
         </>
       ) : (
@@ -356,21 +369,24 @@ export default function Checkin({ orgLocations }: CheckinProps) {
         </>
       )
     ) : (
-      <div>
+      <div className={styles.teamSnapLoginBox}>
         <p>
           Click this to get your event & contact information from TeamSnap
           instead of entering it manually:
         </p>
         <div>
-          <button onClick={() => doLogin().then(() => userState.reload())}>
-            Log In Using TeamSnap
-          </button>
+          <Button
+            color="primary"
+            label="Log In Using TeamSnap"
+            onClick={() => doLogin().then(() => userState.reload())}
+          />
         </div>
       </div>
     );
   };
-  let renderOutcome = function () {
-    return healthAnswers.some((ans) => ans !== false) ? (
+  const renderOutcome = function () {
+    const healthCheckPassed = !healthAnswers.some((ans) => ans !== false);
+    return !healthCheckPassed ? (
       <div className={styles.healthCheckNoPass}>
         <h1>&#9888;</h1>
         <h2>Stay Home</h2>
@@ -380,7 +396,7 @@ export default function Checkin({ orgLocations }: CheckinProps) {
       <>
         <div className={styles.healthCheckPass}>
           <h1>&#9745;</h1>
-          <h2>Health Check Passed</h2>
+          <h2>Health Check Cleared</h2>
           {renderSummary()}
         </div>
         <p>
@@ -421,105 +437,203 @@ export default function Checkin({ orgLocations }: CheckinProps) {
           <h1>Event Check-in</h1>
           {renderTeamSnapEventPicker()}
 
-          <label className={styles.field}>
-            Location
-            {!(teamSnapEvent || locationParam) &&
-              orgLocations.map((orgLocation) => (
-                <label key={orgLocation}>
-                  <input
-                    checked={orgLocation === eventLocation}
-                    type="checkbox"
-                    value={orgLocation}
-                    onChange={() => setEventLocation(orgLocation)}
-                  />{" "}
-                  {orgLocation}
-                </label>
-              ))}
-            <input
-              disabled={!!(teamSnapEvent || locationParam)}
-              value={eventLocation}
-              onChange={(e) => setEventLocation(e.target.value)}
-            />
-          </label>
-          <label className={styles.field}>
-            Date
-            <input
-              disabled={!!teamSnapEvent}
-              min={formatDate(startDate, "yyyy-MM-dd")}
-              max={formatDate(endDate, "yyyy-MM-dd")}
-              type="date"
-              value={eventDate}
-              onChange={(e) => setEventDate(e.target.value)}
-            />
-            <p>e.g. {formatDate(new Date(), "yyyy-MM-dd")}</p>
-          </label>
-          <label>
-            Event Start Time
-            <input
-              disabled={!!teamSnapEvent}
-              id="time-input"
-              type="time"
-              value={eventTime}
-              onChange={(e) => setEventTime(e.target.value)}
-            />
-            <p>e.g. {formatDate(new Date(), "h:mm a")}</p>
-          </label>
-          {eventTimestamp > endDate ? (
-            <p className={styles.dateWarning}>
-              You can only use this form to check into an event less than{" "}
-              {lookAheadHours} hours in the future
-            </p>
-          ) : eventTimestamp < startDate ? (
-            <p className={styles.dateWarning}>
-              You can only use this form to check into an event less than{" "}
-              {lookBackHours} hours in the past
-            </p>
-          ) : null}
-          <label className={styles.field}>
-            Player Full Name
-            <input
-              value={memberName}
-              onChange={(e) => setMemberName(e.target.value)}
-            />
-          </label>
-          <label className={styles.field}>
-            Parent / Emergency Contact Name
-            <input
-              value={contactName}
-              onChange={(e) => setContactName(e.target.value)}
-            />
-          </label>
-          <label className={styles.field}>
-            Contact phone number(s)
-            <input
-              value={contactPhoneNumber}
-              onChange={(e) => setContactPhoneNumber(e.target.value)}
-            />
-            <p>
-              e.g. <i>778-123-4567, 604-299-2999</i>
-            </p>
-          </label>
-          <label className={styles.field}>
-            Contact email address(es)
-            <input
-              value={contactEmail}
-              onChange={(e) => setContactEmail(e.target.value)}
-            />
-            <p>
-              e.g. <i>hector@example.org, maria@example.org</i>
-            </p>
-          </label>
-          {healthQuestionList.map((q, n) => (
-            <div key={`question-${n}`} className={styles.healthQuestion}>
-              {q}
-              <YesNo
-                value={healthAnswers[n]}
-                onChange={(e) => setHealthAnswer(n, e.target.value === "true")}
+          <FieldGroup>
+            <FieldLabel name="eventLocation">Location</FieldLabel>
+            {!teamSnapEvent && (
+              <FieldWrapper
+                name="eventLocation"
+                field="radio"
+                fieldProps={{
+                  inputProps: {
+                    onChange: (e: ChangeEvent<HTMLInputElement>) => {
+                      console.log(e, e.target.value);
+                      setEventLocation(e.target.value);
+                    },
+                  },
+                  options: orgLocations.map((label) => ({
+                    inputProps: { checked: label === eventLocation },
+                    label,
+                    value: label,
+                  })),
+                }}
               />
-            </div>
+            )}
+            <FieldWrapper
+              fieldProps={{
+                inputProps: {
+                  disabled: !!teamSnapEvent,
+                  onChange: (e: ChangeEvent<HTMLInputElement>) =>
+                    setEventLocation(e.target.value),
+                  value: eventLocation,
+                },
+              }}
+              field="text"
+              name="eventLocation"
+              message={
+                showBlankFieldErrors && !eventLocation
+                  ? "Please input/choose a location"
+                  : null
+              }
+              status={showBlankFieldErrors && !eventLocation ? "error" : null}
+            />
+          </FieldGroup>
+          <FieldWrapper
+            name="eventDate"
+            label="Date"
+            field="text"
+            fieldProps={{
+              inputProps: {
+                disabled: !!teamSnapEvent,
+                min: formatDate(startDate, "yyyy-MM-dd"),
+                max: formatDate(endDate, "yyyy-MM-dd"),
+                type: "date",
+                value: eventDate,
+                onChange: (e: ChangeEvent<HTMLInputElement>) =>
+                  setEventDate(e.target.value),
+              },
+            }}
+            message={
+              showBlankFieldErrors && !eventDate
+                ? "Please choose a date"
+                : `e.g. ${formatDate(new Date(), "yyyy-MM-dd")}`
+            }
+            status={showBlankFieldErrors && !eventDate ? "error" : null}
+          />
+          <FieldWrapper
+            label="Event Start Time"
+            message={
+              eventTimestamp > endDate
+                ? `You can only use this form to check into an event less than
+                ${lookAheadHours} hours in the future`
+                : eventTimestamp < startDate
+                ? `You can only use this form to check into an event less than
+                ${lookBackHours} hours in the past`
+                : showBlankFieldErrors && !eventTime
+                ? "Please choose a time"
+                : `e.g. ${formatDate(new Date(), "h:mm a")}`
+            }
+            name="eventTime"
+            status={
+              eventTimestamp > endDate ||
+              eventTimestamp < startDate ||
+              (showBlankFieldErrors && !eventTime)
+                ? "error"
+                : null
+            }
+            field="text"
+            fieldProps={{
+              id: "time-input",
+              type: "time",
+              inputProps: {
+                value: eventTime,
+                onChange: (e: ChangeEvent<HTMLInputElement>) =>
+                  setEventTime(e.target.value),
+              },
+            }}
+          />
+          <FieldWrapper
+            field="text"
+            fieldProps={{
+              inputProps: {
+                onChange: (e: ChangeEvent<HTMLInputElement>) =>
+                  setMemberName(e.target.value),
+                value: memberName,
+              },
+            }}
+            label="Player Full Name"
+            name="memberName"
+            message={
+              showBlankFieldErrors && !memberName
+                ? "Please enter the member/player name"
+                : null
+            }
+            status={showBlankFieldErrors && !memberName ? "error" : null}
+          />
+          <FieldWrapper
+            field="text"
+            fieldProps={{
+              inputProps: {
+                onChange: (e: ChangeEvent<HTMLInputElement>) =>
+                  setContactName(e.target.value),
+                value: contactName,
+              },
+            }}
+            label="Parent / Emergency Contact Name"
+            name="contactName"
+            message={
+              showBlankFieldErrors && !contactName
+                ? "Please enter a contact name, or N/A if not applicable"
+                : null
+            }
+            status={showBlankFieldErrors && !contactName ? "error" : null}
+          />
+          <FieldWrapper
+            field="text"
+            fieldProps={{
+              inputProps: {
+                onChange: (e: ChangeEvent<HTMLInputElement>) =>
+                  setContactPhoneNumber(e.target.value),
+                value: contactPhoneNumber,
+              },
+            }}
+            label="Contact phone number(s)"
+            name="contactPhoneNumber"
+            message={
+              showBlankFieldErrors && !contactPhoneNumber
+                ? "Please enter a phone number that should be called for contact tracing"
+                : "e.g. 778-123-4567, 604-299-2999"
+            }
+            status={
+              showBlankFieldErrors && !contactPhoneNumber ? "error" : null
+            }
+          />
+          <FieldWrapper
+            field="text"
+            fieldProps={{
+              onChange: (e: ChangeEvent<HTMLInputElement>) =>
+                setContactEmail(e.target.value),
+              value: contactEmail,
+            }}
+            label="Contact email address(es)"
+            message="e.g. hector@example.org, maria@example.org"
+            name="contactEmail"
+          />
+          {healthQuestionList.map((q, n) => (
+            <FieldWrapper
+              key={`question-${n}`}
+              label={<div className={styles.healthQuestion}>{q}</div>}
+              name={"q" + String(n)}
+              field="radio"
+              fieldProps={{
+                inputProps: {
+                  onChange: (e: ChangeEvent<HTMLInputElement>) =>
+                    setHealthAnswer(n, e.target.value === "Yes"),
+                },
+                options: [
+                  {
+                    inputProps: { checked: healthAnswers[n] === true },
+                    label: "Yes",
+                    value: "Yes",
+                  },
+                  {
+                    inputProps: { checked: healthAnswers[n] === false },
+                    label: "No",
+                    value: "No",
+                  },
+                ],
+              }}
+              message={
+                showBlankFieldErrors && typeof healthAnswers[n] !== "boolean"
+                  ? "Please answer yes or no"
+                  : null
+              }
+              status={
+                showBlankFieldErrors && typeof healthAnswers[n] !== "boolean" ? "error" : null
+              }
+            />
           ))}
           <div className={styles.formEnd}>
-            <button onClick={onClickSubmit}>Submit</button>
+            <Button color="primary" label="Submit" onClick={onClickSubmit} />
           </div>
         </>
       </main>

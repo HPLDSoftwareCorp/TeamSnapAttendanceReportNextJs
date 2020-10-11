@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@teamsnap/teamsnap-ui": "^3.8.1",
     "@types/lodash": "^4.14.161",
     "ajv": "^6.12.5",
     "axios": "^0.20.0",
@@ -19,6 +20,7 @@
     "json-schema": "^0.2.5",
     "lodash": "^4.17.20",
     "next": "9.5.1",
+    "patch-package": "^6.2.2",
     "react": "16.13.1",
     "react-async": "^10.0.1",
     "react-dom": "16.13.1"

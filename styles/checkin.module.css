@@ -35,14 +35,20 @@ div.field {
 .main > label > input,
 .main > div.field > input {
   display: block;
+  font-size: 14px;
+  padding: 4px;
+  border: 1px solid #555;
+  border-radius: 4px;
   margin-top: 0.5em;
   max-width: 20em;
 }
 
-.main > label > p,
-.main > div.field > p {
-  font-size: 14px;
-  font-weight: normal;
+.teamSnapLoginBox {
+  margin-bottom: 24px;
+}
+
+.teamSnapLoginBox p {
+  margin-bottom: 16px;
 }
 
 table.eventPickerTable label {
@@ -50,6 +56,20 @@ table.eventPickerTable label {
   margin: 0;
   padding: 0;
   font-weight: inherit;
+}
+
+.healthQuestion,
+.healthQuestion h3 {
+  color: black;
+  font-size: 18px;
+  font-weight: normal;
+  line-height: 1.5;
+  padding: 8px 0;
+}
+
+.healthQuestion p {
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 .formEnd {
@@ -83,6 +103,7 @@ table.eventPickerTable label {
 
 .healthCheckPass h1,
 .healthCheckNoPass h1 {
+  color: #030;
   font-size: 64px;
   text-align: center;
   padding: 0;
@@ -91,6 +112,7 @@ table.eventPickerTable label {
 
 .healthCheckPass h2,
 .healthCheckNoPass h2 {
+  color: #030;
   font-size: 32px;
   text-align: center;
   padding: 0;
@@ -100,6 +122,7 @@ table.eventPickerTable label {
 
 .healthCheckPass h3,
 .healthCheckNoPass h3 {
+  color: #030;
   font-size: 24px;
   text-align: center;
   padding: 0;
@@ -118,8 +141,8 @@ table.eventPickerTable label {
 }
 
 .healthCheckPass {
-  border: 10px solid #cfc;
-  background-color: #efe;
+  border: 10px solid #0a0;
+  background-color: #5f5;
 }
 
 .healthCheckNoPass {

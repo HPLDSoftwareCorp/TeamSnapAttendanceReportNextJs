@@ -22,6 +22,22 @@ td {
   padding: 0.5em 1em;
 }
 
+label.FieldGroup-label {
+  font-size: 18px;
+  padding: 8px 0;
+}
+
+input.Input[type="text"],
+input.Input[type="date"],
+input.Input[type="time"] {
+  font-size: 18px;
+  height: 2em;
+}
+
+.FieldGroup-label {
+  font-size: 18px;
+}
+
 @media print {
   .noPrint,
   h1,
