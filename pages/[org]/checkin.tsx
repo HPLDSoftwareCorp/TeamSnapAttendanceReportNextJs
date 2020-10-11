@@ -448,43 +448,43 @@ export default function Checkin({ orgLocations }: CheckinProps) {
 
           <FieldGroup>
             <FieldLabel name="eventLocation">Location</FieldLabel>
-            {!teamSnapEvent && (
-              <FieldWrapper
-                name="eventLocation"
-                field="radio"
-                fieldProps={{
-                  inputProps: {
-                    onChange: (e: ChangeEvent<HTMLInputElement>) => {
-                      console.log(e, e.target.value);
-                      setEventLocation(e.target.value);
-                    },
-                  },
-                  options: orgLocations.map((label) => ({
-                    inputProps: { checked: label === eventLocation },
-                    label,
-                    value: label,
-                  })),
-                }}
-              />
-            )}
             <FieldWrapper
+              name="eventLocation"
+              field="radio"
               fieldProps={{
                 inputProps: {
-                  disabled: !!teamSnapEvent,
-                  onChange: (e: ChangeEvent<HTMLInputElement>) =>
-                    setEventLocation(e.target.value),
-                  value: eventLocation,
+                  onChange: (e: ChangeEvent<HTMLInputElement>) => {
+                    setEventLocation(e.target.value);
+                  },
                 },
+                options: orgLocations.map((label) => ({
+                  disabled: !!teamSnapEvent,
+                  inputProps: { checked: label === eventLocation },
+                  label,
+                  value: label,
+                })),
               }}
-              field="text"
-              name="eventLocation"
-              message={
-                showBlankFieldErrors && !eventLocation
-                  ? "Please input/choose a location"
-                  : null
-              }
-              status={showBlankFieldErrors && !eventLocation ? "error" : null}
             />
+            {!orgLocations.length && (
+              <FieldWrapper
+                fieldProps={{
+                  inputProps: {
+                    disabled: !!teamSnapEvent,
+                    onChange: (e: ChangeEvent<HTMLInputElement>) =>
+                      setEventLocation(e.target.value),
+                    value: eventLocation,
+                  },
+                }}
+                field="text"
+                name="eventLocation"
+                message={
+                  showBlankFieldErrors && !eventLocation
+                    ? "Please input/choose a location"
+                    : null
+                }
+                status={showBlankFieldErrors && !eventLocation ? "error" : null}
+              />
+            )}
           </FieldGroup>
           <FieldWrapper
             name="eventDate"
