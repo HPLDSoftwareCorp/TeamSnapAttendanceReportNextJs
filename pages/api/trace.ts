@@ -3,7 +3,7 @@ import createTeamSnapClient from "../../lib/server/teamsnap/createTeamSnapClient
 import loadMe from "../../lib/server/teamsnap/loadMe";
 import loadEvent from "../../lib/server/teamsnap/loadEvent";
 import initFirebaseAdmin from "../../lib/server/firebase/initFirebaseAdmin";
-import formatDate from "date-fns/format";
+import { addMinutes, subMinutes } from "date-fns";
 
 export default async function trace(
   req: IncomingMessage & { body: any; query: any; cookies: any },
@@ -58,9 +58,10 @@ export default async function trace(
   const checkinsCollection = orgDoc.collection("checkins");
   const matchingCheckins = await checkinsCollection
     .where("eventLocation", "==", event.locationName)
-    .where("eventTimestamp", "==", event.startDate)
+    .where("eventTimestamp", ">=", subMinutes(event.startDate, 30))
+    .where("eventTimestamp", "<=", addMinutes(event.startDate, 30))
     .get();
   const items = matchingCheckins.docs.map((doc: any) => doc.data());
-  res.setHeader('Content-Type', 'application/json');
+  res.setHeader("Content-Type", "application/json");
   res.end(JSON.stringify({ items }));
 }
