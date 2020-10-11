@@ -590,13 +590,20 @@ export default function Checkin({ orgLocations }: CheckinProps) {
           <FieldWrapper
             field="text"
             fieldProps={{
-              onChange: (e: ChangeEvent<HTMLInputElement>) =>
-                setContactEmail(e.target.value),
-              value: contactEmail,
+              inputProps: {
+                onChange: (e: ChangeEvent<HTMLInputElement>) =>
+                  setContactEmail(e.target.value),
+                value: contactEmail,
+              },
             }}
             label="Contact email address(es)"
-            message="e.g. hector@example.org, maria@example.org"
+            message={
+              showBlankFieldErrors && !contactEmail
+                ? "Please enter an email address that should be used to contact you"
+                : "e.g. hector@example.org, maria@example.org"
+            }
             name="contactEmail"
+            status={showBlankFieldErrors && !contactEmail ? "error" : null}
           />
           {healthQuestionList.map((q, n) => (
             <FieldWrapper
@@ -628,7 +635,9 @@ export default function Checkin({ orgLocations }: CheckinProps) {
                   : null
               }
               status={
-                showBlankFieldErrors && typeof healthAnswers[n] !== "boolean" ? "error" : null
+                showBlankFieldErrors && typeof healthAnswers[n] !== "boolean"
+                  ? "error"
+                  : null
               }
             />
           ))}
