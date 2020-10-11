@@ -1,6 +1,8 @@
 import firebase from "firebase/app";
 
+import 'firebase/auth';
 import 'firebase/firestore';
+import 'firebase/analytics';
 
 export default function initFirebaseWebApp() {
   if (!firebase.apps.length) {
@@ -18,4 +20,5 @@ export default function initFirebaseWebApp() {
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
   }
+  return firebase;
 }

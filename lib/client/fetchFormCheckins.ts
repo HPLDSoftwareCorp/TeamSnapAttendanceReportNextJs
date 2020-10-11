@@ -1,6 +1,7 @@
 import loadTeamSnap from "./teamsnap/loadTeamSnap";
 import memoize from "lodash/memoize";
 import { CheckinDoc } from "../CheckinDoc";
+import axios from "axios";
 
 export default memoize(
   async function fetchFormCheckins(
@@ -12,13 +13,9 @@ export default memoize(
       return [];
     }
     const authToken = sessionStorage.getItem("teamsnap.authToken");
-    return fetch("/api/trace", {
-      body: JSON.stringify({ authToken, eventId, org }),
-      headers: { "content-type": "application/json" },
-      method: "POST",
-    })
-      .then((r) => r.json())
-      .then((j) => j.items);
+    return axios
+      .post("/api/trace", { authToken, eventId, org })
+      .then((r) => r.data.items);
   },
   (eventId: number, org: string) => [eventId, org].join(", ")
 );

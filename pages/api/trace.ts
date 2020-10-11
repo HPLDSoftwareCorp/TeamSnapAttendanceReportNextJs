@@ -16,7 +16,7 @@ export default async function trace(
   }
 
   const { eventId, authToken, org } = req.body;
-  if (!(eventId && authToken)) {
+  if (!(eventId && authToken && org)) {
     res.statusCode = 400;
     res.end("Missing parameters");
     return;
@@ -24,7 +24,7 @@ export default async function trace(
   const firebase = initFirebaseAdmin();
   const firestore = firebase.firestore();
   const orgsCollection = firestore.collection("orgs");
-  const orgDoc = orgsCollection.doc(req.body.org);
+  const orgDoc = orgsCollection.doc(org);
   const orgData = await orgDoc.get();
   if (!orgData) {
     console.error("trace request for invalid org", org);
@@ -73,5 +73,6 @@ export default async function trace(
     .where("eventTimestamp", "==", event.startDate)
     .get();
   const items = matchingCheckins.docs.map((doc: any) => doc.data());
+  res.setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify({ items }));
 }

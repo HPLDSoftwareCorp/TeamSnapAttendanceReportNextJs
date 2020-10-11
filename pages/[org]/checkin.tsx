@@ -31,6 +31,7 @@ import {
   FieldLabel,
   FieldWrapper,
 } from "@teamsnap/teamsnap-ui";
+import firebaseLogin from "../../lib/client/firebaseLogin";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
@@ -89,6 +90,7 @@ export default function Checkin({ orgLocations }: CheckinProps) {
   });
   const userState = useAsync<TeamSnapUser | null>(loadMe);
   const user = userState.data;
+  const firebaseLoginState = useAsync({ promise: firebaseLogin(org) });
   const teamsState = useAsync<TeamSnapTeam[]>({
     promise: user && loadActiveTeams(user),
   });
@@ -285,7 +287,7 @@ export default function Checkin({ orgLocations }: CheckinProps) {
   );
 
   const renderTeamSnapEventPicker = function () {
-    return userState.isPending ? (
+    return userState.isPending || firebaseLoginState.isPending ? (
       <>Loading...</>
     ) : userState.error ? (
       ErrorBox({ error: userState.error })

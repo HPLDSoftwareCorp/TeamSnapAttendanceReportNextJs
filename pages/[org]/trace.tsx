@@ -33,6 +33,8 @@ import { GetServerSideProps } from "next";
 import redirectToLogin from "lib/server/teamsnap/redirectToLogin";
 import initFirebaseAdmin from "lib/server/firebase/initFirebaseAdmin";
 import loadOrgLocationNames from "../../lib/server/firebase/loadOrgLocationNames";
+import firebaseLogin from "../../lib/client/firebaseLogin";
+import firebaseLogout from "../../lib/client/firebaseLogout";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   if (context.query.login) {
@@ -78,6 +80,7 @@ export default function Trace({ orgLocations = [] }: TraceProps) {
   );
   const [endDate, setEndDate] = useState<Date>(endOfWeek(Date.now()));
   const userState = useAsync<TeamSnapUser | null>(loadMe);
+  const firebaseLoginState = useAsync({ promise: firebaseLogin(org) });
   const user = userState.data;
   const divisionsState = useAsync<TeamSnapDivision[] | null>(loadDivisions);
   const divisions = divisionsState.data || [];
@@ -134,9 +137,13 @@ export default function Trace({ orgLocations = [] }: TraceProps) {
         <TopBar
           title="Contact Tracing"
           user={user}
-          onClickLogout={() => doLogout().then(() => userState.reload())}
+          onClickLogout={() =>
+            doLogout()
+              .then(firebaseLogout)
+              .then(() => userState.reload())
+          }
         />
-        {userState.isPending ? (
+        {userState.isPending || firebaseLoginState.isPending ? (
           <>Loading...</>
         ) : userState.error ? (
           <>
@@ -340,11 +347,14 @@ export default function Trace({ orgLocations = [] }: TraceProps) {
               service is not guaranteed - use at your own risk.
             </p>
             <p>
-              <strong>Privacy</strong> Team attendance and contact data is kept
-              private and handled entirely on your own device / computer, and is
-              not shared with us or any third party. We may keep records of the
-              name, email address, league name, TeamSnap user/league ID, and IP
-              address of users who log in.
+              <strong>Privacy</strong> Team attendance and contact data from
+              TeamSnap is kept private and handled entirely on your own device /
+              computer, and is not shared with us or any third party.
+              Information gathered using the checkin web form is stored. We do
+              keep records of the name, email address, phone number, league
+              name, TeamSnap user/league/team IDs, and IP address of users who
+              log in using TeamSnap for either the reporting system or the
+              checkin form.
             </p>
             <p>
               <strong>Pricing</strong>{" "}
