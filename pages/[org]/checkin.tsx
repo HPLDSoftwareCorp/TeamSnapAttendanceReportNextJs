@@ -203,7 +203,7 @@ export default function Checkin({ orgLocations }: CheckinProps) {
     } else {
       const timestamp = new Date();
 
-      logEvent("Check In Form Completed", {
+      logEvent("Submit Check In Form", {
         eventLocation,
         org,
         passed: healthQuestionList.every((q, i) => healthAnswers[i] === true),
@@ -384,7 +384,10 @@ export default function Checkin({ orgLocations }: CheckinProps) {
           <Button
             color="primary"
             label="Log In Using TeamSnap"
-            onClick={() => doLogin().then(() => userState.reload())}
+            onClick={() => {
+              logEvent("Click Login");
+              doLogin().then(() => userState.reload());
+            }}
           />
         </div>
       </div>

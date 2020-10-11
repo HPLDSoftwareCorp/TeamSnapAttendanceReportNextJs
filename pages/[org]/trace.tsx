@@ -35,6 +35,7 @@ import initFirebaseAdmin from "lib/server/firebase/initFirebaseAdmin";
 import loadOrgLocationNames from "../../lib/server/firebase/loadOrgLocationNames";
 import firebaseLogin from "../../lib/client/firebaseLogin";
 import firebaseLogout from "../../lib/client/firebaseLogout";
+import logEvent from "../../lib/client/logEvent";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   if (context.query.login) {
@@ -318,7 +319,14 @@ export default function Trace({ orgLocations = [] }: TraceProps) {
                             the appropriate person.
                           </p>
                           <p>
-                            <button onClick={() => print()}>Print</button>
+                            <button
+                              onClick={() => {
+                                logEvent("Clicked Print");
+                                print();
+                              }}
+                            >
+                              Print
+                            </button>
                           </p>
                         </div>
                       </>
@@ -374,7 +382,10 @@ export default function Trace({ orgLocations = [] }: TraceProps) {
             </p>
             <button
               disabled={!agreed}
-              onClick={() => doLogin().then(() => userState.reload())}
+              onClick={() => {
+                logEvent("Clicked Login");
+                doLogin().then(() => userState.reload());
+              }}
             >
               Log In
             </button>
