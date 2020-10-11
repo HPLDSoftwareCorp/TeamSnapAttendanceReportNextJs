@@ -38,6 +38,10 @@ input.Input[type="time"] {
   font-size: 18px;
 }
 
+.FieldGroup > .Checkbox:last-child {
+  padding-bottom: 0;
+}
+
 @media print {
   .noPrint,
   h1,

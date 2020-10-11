@@ -446,10 +446,10 @@ export default function Checkin({ orgLocations }: CheckinProps) {
           <h1>Event Check-in</h1>
           {renderTeamSnapEventPicker()}
 
-          <FieldGroup>
-            <FieldLabel name="eventLocation">Location</FieldLabel>
+          {orgLocations.length ? (
             <FieldWrapper
               name="eventLocation"
+              label="Location"
               field="radio"
               fieldProps={{
                 inputProps: {
@@ -464,8 +464,16 @@ export default function Checkin({ orgLocations }: CheckinProps) {
                   value: label,
                 })),
               }}
+              message={
+                showBlankFieldErrors && !eventLocation
+                  ? "Please choose a location"
+                  : null
+              }
+              status={showBlankFieldErrors && !eventLocation ? "error" : null}
             />
-            {!orgLocations.length && (
+          ) : (
+            <FieldGroup>
+              <FieldLabel name="eventLocation">Location</FieldLabel>
               <FieldWrapper
                 fieldProps={{
                   inputProps: {
@@ -479,13 +487,13 @@ export default function Checkin({ orgLocations }: CheckinProps) {
                 name="eventLocation"
                 message={
                   showBlankFieldErrors && !eventLocation
-                    ? "Please input/choose a location"
+                    ? "Please enter a location"
                     : null
                 }
                 status={showBlankFieldErrors && !eventLocation ? "error" : null}
               />
-            )}
-          </FieldGroup>
+            </FieldGroup>
+          )}
           <FieldWrapper
             name="eventDate"
             label="Date"
@@ -516,7 +524,7 @@ export default function Checkin({ orgLocations }: CheckinProps) {
                 ${lookAheadHours} hours in the future`
                 : eventTimestamp < startDate
                 ? `You can only use this form to check into an event less than
-                ${lookBackHours} hours in the past`
+                ${lookBackHours} hour in the past`
                 : showBlankFieldErrors && !eventTime
                 ? "Please choose a time"
                 : `e.g. ${formatDate(new Date(), "h:mm a")}`
@@ -534,6 +542,7 @@ export default function Checkin({ orgLocations }: CheckinProps) {
               id: "time-input",
               type: "time",
               inputProps: {
+                disabled: !!teamSnapEvent,
                 value: eventTime,
                 onChange: (e: ChangeEvent<HTMLInputElement>) =>
                   setEventTime(e.target.value),
@@ -549,7 +558,7 @@ export default function Checkin({ orgLocations }: CheckinProps) {
                 value: memberName,
               },
             }}
-            label="Player Full Name"
+            label="Full Name"
             name="memberName"
             message={
               showBlankFieldErrors && !memberName
@@ -614,42 +623,44 @@ export default function Checkin({ orgLocations }: CheckinProps) {
             name="contactEmail"
             status={showBlankFieldErrors && !contactEmail ? "error" : null}
           />
-          {healthQuestionList.map((q, n) => (
-            <FieldWrapper
-              key={`question-${n}`}
-              label={<div className={styles.healthQuestion}>{q}</div>}
-              name={"q" + String(n)}
-              field="radio"
-              fieldProps={{
-                inputProps: {
-                  onChange: (e: ChangeEvent<HTMLInputElement>) =>
-                    setHealthAnswer(n, e.target.value === "Yes"),
-                },
-                options: [
-                  {
-                    inputProps: { checked: healthAnswers[n] === true },
-                    label: "Yes",
-                    value: "Yes",
+          <div className={styles.questions}>
+            {healthQuestionList.map((q, n) => (
+              <FieldWrapper
+                key={`question-${n}`}
+                label={<div className={styles.healthQuestion}>{q}</div>}
+                name={"q" + String(n)}
+                field="radio"
+                fieldProps={{
+                  inputProps: {
+                    onChange: (e: ChangeEvent<HTMLInputElement>) =>
+                      setHealthAnswer(n, e.target.value === "Yes"),
                   },
-                  {
-                    inputProps: { checked: healthAnswers[n] === false },
-                    label: "No",
-                    value: "No",
-                  },
-                ],
-              }}
-              message={
-                showBlankFieldErrors && typeof healthAnswers[n] !== "boolean"
-                  ? "Please answer yes or no"
-                  : null
-              }
-              status={
-                showBlankFieldErrors && typeof healthAnswers[n] !== "boolean"
-                  ? "error"
-                  : null
-              }
-            />
-          ))}
+                  options: [
+                    {
+                      inputProps: { checked: healthAnswers[n] === true },
+                      label: "Yes",
+                      value: "Yes",
+                    },
+                    {
+                      inputProps: { checked: healthAnswers[n] === false },
+                      label: "No",
+                      value: "No",
+                    },
+                  ],
+                }}
+                message={
+                  showBlankFieldErrors && typeof healthAnswers[n] !== "boolean"
+                    ? "Please answer yes or no"
+                    : null
+                }
+                status={
+                  showBlankFieldErrors && typeof healthAnswers[n] !== "boolean"
+                    ? "error"
+                    : null
+                }
+              />
+            ))}
+          </div>
           <div className={styles.formEnd}>
             <Button color="primary" label="Submit" onClick={onClickSubmit} />
           </div>
