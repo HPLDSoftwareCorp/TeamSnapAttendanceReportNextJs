@@ -20,7 +20,6 @@ import parseDate from "date-fns/parse";
 import loadMemberPhoneNumbers from "lib/client/teamsnap/loadMemberPhoneNumbers";
 import loadTeamContactsForUser from "lib/client/teamsnap/loadTeamContactsForUser";
 import { useRouter } from "next/router";
-import YesNo from "components/YesNo";
 import loadContactPhoneNumbers from "lib/client/teamsnap/loadContactPhoneNumbers";
 import loadContactEmailAddresses from "lib/client/teamsnap/loadContactEmailAddresses";
 import loadMemberEmailAddresses from "lib/client/teamsnap/loadMemberEmailAddresses";
@@ -30,7 +29,6 @@ import {
   Button,
   FieldGroup,
   FieldLabel,
-  FieldMessage,
   FieldWrapper,
 } from "@teamsnap/teamsnap-ui";
 
