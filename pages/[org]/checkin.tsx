@@ -409,8 +409,9 @@ export default function Checkin({ orgLocations }: CheckinProps) {
           {renderSummary()}
         </div>
         <p>
-          Keep this page open on your phone to show at the door. If you close it
-          accidentally you can always fill in the form again.
+          Keep this page open on your phone to show at the door, or take
+          screenshot to show later. If you lose this screen accidentally you can
+          always fill in the form again.
         </p>
       </>
     );
