@@ -1,0 +1,151 @@
+diff --git a/node_modules/@teamsnap/teamsnap-ui/dist/js/components/FieldWrapper/FieldWrapper.js b/node_modules/@teamsnap/teamsnap-ui/dist/js/components/FieldWrapper/FieldWrapper.js
+index c1769a6..1ec8644 100644
+--- a/node_modules/@teamsnap/teamsnap-ui/dist/js/components/FieldWrapper/FieldWrapper.js
++++ b/node_modules/@teamsnap/teamsnap-ui/dist/js/components/FieldWrapper/FieldWrapper.js
+@@ -58,6 +58,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
+     __setModuleDefault(result, mod);
+     return result;
+ };
++var __rest = (this && this.__rest) || function (s, e) {
++    var t = {};
++    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
++        t[p] = s[p];
++    if (s != null && typeof Object.getOwnPropertySymbols === "function")
++        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
++            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
++                t[p[i]] = s[p[i]];
++        }
++    return t;
++};
+ Object.defineProperty(exports, "__esModule", { value: true });
+ var React = __importStar(require("react"));
+ var PropTypes = __importStar(require("prop-types"));
+@@ -87,8 +98,8 @@ var FieldWrapper = /** @class */ (function (_super) {
+             if ((field == "checkbox" || field == "radio") && fieldProps.options) {
+                 return (fieldProps.options &&
+                     fieldProps.options.map(function (_a, i) {
+-                        var label = _a.label;
+-                        return (React.createElement(FieldTag, __assign({ name: name, label: label, key: i }, fieldProps)));
++                        var label = _a.label, value = _a.value, optionProps = __rest(_a, ["label", "value"]);
++                        return (React.createElement(FieldTag, __assign({ key: i }, fieldProps, { group: name, name: name + String(i), label: label }, optionProps, { inputProps: __assign(__assign(__assign({}, fieldProps.inputProps), optionProps.inputProps), { value: value !== null && value !== void 0 ? value : label }) })));
+                     }));
+             }
+             return React.createElement(FieldTag, __assign({ name: name }, fieldProps));
+diff --git a/node_modules/@teamsnap/teamsnap-ui/dist/js/components/FieldWrapper/FieldWrapper.stories.js b/node_modules/@teamsnap/teamsnap-ui/dist/js/components/FieldWrapper/FieldWrapper.stories.js
+index 34f9191..c30ab08 100644
+--- a/node_modules/@teamsnap/teamsnap-ui/dist/js/components/FieldWrapper/FieldWrapper.stories.js
++++ b/node_modules/@teamsnap/teamsnap-ui/dist/js/components/FieldWrapper/FieldWrapper.stories.js
+@@ -24,6 +24,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
+ Object.defineProperty(exports, "__esModule", { value: true });
+ var React = __importStar(require("react"));
+ var react_1 = require("@storybook/react");
++var addon_actions_1 = require("@storybook/addon-actions");
+ var react_2 = require("@storybook/addon-knobs/react");
+ var FieldWrapper_1 = __importDefault(require("./FieldWrapper"));
+ var stories = react_1.storiesOf("FieldWrapper", module);
+@@ -55,15 +56,29 @@ stories.add("Select", function () {
+ stories.add("Checkbox", function () {
+     var errorMessage = react_2.text("Error Message", "There was an error");
+     var status = react_2.select("status", statusOptions);
+-    return (React.createElement(FieldWrapper_1.default, { name: "example", label: "Test Input", field: "checkbox", status: status, message: status === "error" ? errorMessage : null, fieldProps: { options: [{ label: "Check me" }, { label: "Check me" }] } }));
++    return (React.createElement(FieldWrapper_1.default, { name: "example", label: "Test Input", field: "checkbox", status: status, message: status === "error" ? errorMessage : null, fieldProps: {
++            inputProps: {
++                onChange: function (e) {
++                    console.log(e.target.value + ' clicked');
++                    addon_actions_1.action(e.target.value + ' clicked');
++                },
++            },
++            options: [{ label: "Check me A", name: "A", value: "A" }, { label: "Check me B", name: "B", value: "B" }]
++        } }));
+ });
+ stories.add("Radio", function () {
+     var errorMessage = react_2.text("Error Message", "There was an error");
+     var status = react_2.select("status", statusOptions);
+     return (React.createElement(FieldWrapper_1.default, { name: "example", label: "Test Input", field: "radio", status: status, message: status === "error" ? errorMessage : null, fieldProps: {
++            inputProps: {
++                onChange: function (e) {
++                    console.log(e.target.value + ' selected');
++                    addon_actions_1.action(e.target.value + ' selected');
++                },
++            },
+             options: [
+-                { label: "Video killed the radio star" },
+-                { label: "Check me" }
++                { label: "Video killed the radio star", value: "A" },
++                { label: "Check me", value: "B" }
+             ]
+         } }));
+ });
+diff --git a/node_modules/@teamsnap/teamsnap-ui/src/js/components/FieldWrapper/FieldWrapper.stories.tsx b/node_modules/@teamsnap/teamsnap-ui/src/js/components/FieldWrapper/FieldWrapper.stories.tsx
+index 96050a4..9e6e1c0 100644
+--- a/node_modules/@teamsnap/teamsnap-ui/src/js/components/FieldWrapper/FieldWrapper.stories.tsx
++++ b/node_modules/@teamsnap/teamsnap-ui/src/js/components/FieldWrapper/FieldWrapper.stories.tsx
+@@ -1,8 +1,10 @@
+ import * as React from "react";
+ 
+ import { storiesOf } from "@storybook/react";
++import { action } from '@storybook/addon-actions';
+ import { select, text } from "@storybook/addon-knobs/react";
+ import FieldWrapper from "./FieldWrapper";
++import { ChangeEvent } from 'react';
+ 
+ const stories = storiesOf("FieldWrapper", module);
+ 
+@@ -63,7 +65,15 @@ stories.add("Checkbox", () => {
+       field="checkbox"
+       status={status}
+       message={status === "error" ? errorMessage : null}
+-      fieldProps={{ options: [{ label: "Check me" }, { label: "Check me" }] }}
++      fieldProps={{
++        inputProps: {
++          onChange: (e: ChangeEvent<HTMLInputElement>) => {
++            console.log(e.target.value + ' clicked');
++            action(e.target.value + ' clicked');
++          },
++        },
++        options: [{ label: "Check me A", name: "A", value: "A" }, { label: "Check me B", name: "B", value: "B" }]
++      }}
+     />
+   );
+ });
+@@ -80,9 +90,15 @@ stories.add("Radio", () => {
+       status={status}
+       message={status === "error" ? errorMessage : null}
+       fieldProps={{
++        inputProps: {
++          onChange: (e: ChangeEvent<HTMLInputElement>) => {
++            console.log(e.target.value + ' selected');
++            action(e.target.value + ' selected');
++          },
++        },
+         options: [
+-          { label: "Video killed the radio star" },
+-          { label: "Check me" }
++          { label: "Video killed the radio star", value: "A" },
++          { label: "Check me", value: "B" }
+         ]
+       }}
+     />
+diff --git a/node_modules/@teamsnap/teamsnap-ui/src/js/components/FieldWrapper/FieldWrapper.tsx b/node_modules/@teamsnap/teamsnap-ui/src/js/components/FieldWrapper/FieldWrapper.tsx
+index ca5b7a9..45982e4 100644
+--- a/node_modules/@teamsnap/teamsnap-ui/src/js/components/FieldWrapper/FieldWrapper.tsx
++++ b/node_modules/@teamsnap/teamsnap-ui/src/js/components/FieldWrapper/FieldWrapper.tsx
+@@ -67,8 +67,16 @@ class FieldWrapper extends React.PureComponent<PropTypes.InferProps<typeof Field
+     if ((field == "checkbox" || field == "radio") && fieldProps.options) {
+       return (
+         fieldProps.options &&
+-        fieldProps.options.map(({ label }, i) => (
+-          <FieldTag name={name} label={label} key={i} {...fieldProps} />
++        fieldProps.options.map(({ label, value, ...optionProps }, i) => (
++          <FieldTag
++            key={i}
++            {...fieldProps}
++            group={name}
++            name={name + String(i)}
++            label={label}
++            {...optionProps}
++            inputProps={{...fieldProps.inputProps, ...optionProps.inputProps, value: value ?? label}}
++          />
+         ))
+       );
+     }
