@@ -46,6 +46,7 @@
   flex-direction: row;
   align-items: center;
 }
+
 .loginState button {
   border: none;
   color: white;
@@ -87,17 +88,19 @@ li.event table {
   width: 100%;
 }
 
-@media only screen and (min-width: 600px) {
+div.dateRange {
+  margin-bottom: 1em;
+}
 
+@media only screen and (min-width: 600px) {
   div.dateRange input[type="date"] {
     width: 12em;
   }
-
 }
 
 @media only screen and (max-width: 600px) {
-
-  li.event table th, li.event table td {
+  li.event table th,
+  li.event table td {
     font-size: 12px;
   }
 
@@ -110,9 +113,7 @@ li.event table {
     padding: 0.5em;
     margin-bottom: 1em;
   }
-
 }
-
 
 @media print {
   .footer,

@@ -132,6 +132,10 @@ export interface TeamSnapUser {
     key: "activeTeams",
     params: { userId: number }
   ): Promise<TeamSnapTeam[]>;
+  loadItems(
+    key: "activeDivisions",
+    params: { userId: number }
+  ): Promise<TeamSnapDivision[]>;
 }
 
 type LoadEventsParams = {

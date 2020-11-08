@@ -36,6 +36,7 @@ import loadOrgLocationNames from "../../lib/server/firebase/loadOrgLocationNames
 import firebaseLogin from "../../lib/client/firebaseLogin";
 import firebaseLogout from "../../lib/client/firebaseLogout";
 import logEvent from "../../lib/client/logEvent";
+import loadActiveDivisions from "../../lib/client/teamsnap/loadActiveDivisions";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   if (context.query.login) {
@@ -83,7 +84,9 @@ export default function Trace({ orgLocations = [] }: TraceProps) {
   const userState = useAsync<TeamSnapUser | null>(loadMe);
   const firebaseLoginState = useAsync({ promise: firebaseLogin(org) });
   const user = userState.data;
-  const divisionsState = useAsync<TeamSnapDivision[] | null>(loadDivisions);
+  const divisionsState = useAsync<TeamSnapDivision[] | null>({
+    promise: user && loadActiveDivisions(user),
+  });
   const divisions = divisionsState.data || [];
   const teamsState = useAsync<TeamSnapTeam[]>({
     promise:
