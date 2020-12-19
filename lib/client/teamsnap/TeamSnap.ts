@@ -46,6 +46,8 @@ export interface TeamSnapDivision {
   timeZoneOffset: string;
   type: "division";
   updatedAt: Date;
+
+  loadItems(descendants: string): Promise<TeamSnapDivision[]>;
 }
 
 export interface TeamSnapTeam {

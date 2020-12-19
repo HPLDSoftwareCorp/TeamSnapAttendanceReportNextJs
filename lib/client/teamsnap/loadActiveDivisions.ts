@@ -17,7 +17,22 @@ export default memoize(
     const activeDivisions = await user.loadItems("activeDivisions", {
       userId: user.id,
     });
-    return sortBy(activeDivisions, 'name', 'id');
+    const result = [];
+    for (const division of activeDivisions) {
+      if (division.activeTeamsCount) {
+        result.push(division);
+      }
+      if (division.activeDescendantsCount) {
+        const descendants = await division.loadItems("descendants");
+        for (const descendant of descendants) {
+          if (!descendant.isDisabled && !descendant.isArchived) {
+            activeDivisions.push(descendant);
+          }
+        }
+      }
+    }
+
+    return sortBy(result, "name", "id");
   },
   (user) => String(user?.id)
 );
